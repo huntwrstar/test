@@ -1,0 +1,1548 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XCUBING • 魔方排名网</title>
+    <link rel="icon" href="logo.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ---------- 全局重置 & 粗饼风格基调 ---------- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f2f5f9;
+            color: #333;
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .wrapper {
+            max-width: 1200px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border-radius: 0;
+            width: 100%;
+        }
+
+        .header {
+            background-color: #ffffff;
+            border-bottom: 2px solid #e9ecef;
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-area h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #2c3e50;
+            letter-spacing: -0.5px;
+            margin: 0;
+        }
+
+        .logo-area span {
+            font-size: 1rem;
+            color: #7f8c8d;
+            font-weight: 300;
+            margin-left: 5px;
+        }
+
+        .main-nav {
+            background-color: #ffffff;
+            border-bottom: 1px solid #dee2e6;
+            padding: 0 30px;
+        }
+
+        .main-nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        .main-nav ul li {
+            padding: 15px 0;
+            font-weight: 600;
+            color: #495057;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .main-nav ul li.active {
+            color: #4a6ee0;
+            border-bottom-color: #4a6ee0;
+        }
+
+        .mobile-nav-toggle {
+            display: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #495057;
+        }
+
+        .mobile-menu {
+            display: none;
+            background-color: #ffffff;
+            border-top: 1px solid #dee2e6;
+            padding: 10px 30px;
+        }
+
+        .mobile-menu ul {
+            list-style: none;
+        }
+
+        .mobile-menu ul li {
+            padding: 12px 0;
+            font-weight: 600;
+            color: #495057;
+            cursor: pointer;
+            border-bottom: 1px solid #f1f1f1;
+        }
+
+        .mobile-menu ul li:last-child {
+            border-bottom: none;
+        }
+
+        .mobile-menu ul li.active {
+            color: #4a6ee0;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .home-content {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .home-content h1 {
+            font-size: 3rem;
+            font-weight: 300;
+            color: #2c3e50;
+            margin-bottom: 40px;
+        }
+
+        .announcement {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #f8f9fc;
+            border-left: 5px solid #4a6ee0;
+            padding: 20px 30px;
+            text-align: left;
+            border-radius: 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .announcement h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .announcement p {
+            font-size: 1.1rem;
+            color: #495057;
+        }
+
+        .filter-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: flex-end;
+            background-color: #ffffff;
+            border: 1px solid #dee2e6;
+            padding: 20px 25px;
+            margin-bottom: 25px;
+            border-radius: 0;
+        }
+
+        .filter-item {
+            display: flex;
+            flex-direction: column;
+            min-width: 150px;
+            flex: 1 1 auto;
+        }
+
+        .filter-item label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #6c757d;
+            margin-bottom: 5px;
+            letter-spacing: 0.5px;
+        }
+
+        select, .filter-item select, .filter-item input[type="checkbox"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 0;
+            background-color: white;
+            font-size: 1rem;
+        }
+
+        select:focus {
+            border-color: #4a6ee0;
+            outline: 0;
+            box-shadow: 0 0 0 0.2rem rgba(74, 110, 224, 0.25);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 24px;
+            border: 1px solid transparent;
+            border-radius: 0;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+            background-color: #f8f9fa;
+            border-color: #ced4da;
+            color: #495057;
+        }
+
+        .btn-primary {
+            background-color: #4a6ee0;
+            border-color: #4a6ee0;
+            color: white;
+        }
+
+        .btn-warning {
+            background-color: #f39c12;
+            border-color: #e67e22;
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+            color: white;
+        }
+
+        .current-info {
+            background-color: #f8f9fc;
+            border-left: 5px solid #4a6ee0;
+            padding: 14px 20px;
+            margin-bottom: 25px;
+            font-size: 1rem;
+            border: 1px solid #e9ecef;
+            border-left-width: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .current-info h3 {
+            font-weight: 500;
+            color: #2c3e50;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .help-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: #6c757d;
+            color: white;
+            font-size: 14px;
+            cursor: help;
+            position: relative;
+        }
+
+        .help-icon:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            background: #333;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            white-space: normal;
+            width: 250px;
+            font-size: 14px;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            text-align: left;
+            line-height: 1.4;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border: 1px solid #dee2e6;
+            margin-bottom: 25px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            color: #2c3e50;
+            font-weight: 600;
+            padding: 14px 12px;
+            border-bottom: 2px solid #dee2e6;
+            border-right: 1px solid #dee2e6;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 12px 12px;
+            border-bottom: 1px solid #e9ecef;
+            border-right: 1px solid #e9ecef;
+            white-space: nowrap;
+        }
+
+        td:last-child, th:last-child {
+            border-right: none;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #fdfdfe;
+        }
+
+        tbody tr:hover {
+            background-color: #f1f5ff;
+        }
+
+        .rank-cell {
+            font-weight: 700;
+            color: #4a6ee0;
+            text-align: center;
+        }
+
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .pagination {
+            display: flex;
+            list-style: none;
+            gap: 5px;
+            padding: 0;
+        }
+
+        .pagination li a, .pagination li span {
+            display: block;
+            padding: 8px 14px;
+            border: 1px solid #dee2e6;
+            color: #4a6ee0;
+            background-color: white;
+            text-decoration: none;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+
+        .pagination li a:hover {
+            background-color: #e9ecef;
+            border-color: #ced4da;
+        }
+
+        .pagination li.active a,
+        .pagination li.active span {
+            background-color: #4a6ee0;
+            border-color: #4a6ee0;
+            color: white;
+            font-weight: 600;
+        }
+
+        .pagination li.disabled a,
+        .pagination li.disabled span {
+            color: #adb5bd;
+            pointer-events: none;
+            background-color: #f8f9fa;
+            border-color: #dee2e6;
+        }
+
+        .footer {
+            background-color: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            padding: 20px 30px;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .footer a {
+            color: #4a6ee0;
+            text-decoration: none;
+        }
+
+        @media (max-width: 768px) {
+            .main-nav ul {
+                display: none;
+            }
+            .mobile-nav-toggle {
+                display: block;
+            }
+            .mobile-menu.active {
+                display: block;
+            }
+            .filter-section {
+                flex-direction: column;
+            }
+            .btn-group {
+                width: 100%;
+            }
+            .btn {
+                flex: 1;
+            }
+            .home-content h1 {
+                font-size: 2rem;
+            }
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 5px 0;
+        }
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.9rem;
+            text-transform: none;
+            font-weight: normal;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <header class="header">
+        <div class="logo-area">
+            <h1>XCUBING <span>· 魔方排名网</span></h1>
+        </div>
+        <div class="mobile-nav-toggle">
+            <i class="fas fa-bars"></i>
+        </div>
+    </header>
+
+    <nav class="main-nav">
+        <ul>
+            <li data-page="home">首页</li>
+            <li data-page="season">赛季排名</li>
+            <li data-page="active">现役排名</li>
+            <li data-page="province">省市排名</li>
+            <li data-page="comprehensive">综合排名</li>
+        </ul>
+    </nav>
+
+    <div class="mobile-menu">
+        <ul>
+            <li data-page="home">首页</li>
+            <li data-page="season">赛季排名</li>
+            <li data-page="active">现役排名</li>
+            <li data-page="province">省市排名</li>
+            <li data-page="comprehensive">综合排名</li>
+        </ul>
+    </div>
+
+    <div class="content">
+        <!-- 首页 -->
+        <div id="home-page" class="page active">
+            <div class="home-content">
+                <h1>探索未来，未来已来。</h1>
+                <div class="announcement">
+                    <h3>公告</h3>
+                    <p id="announcement-text">加载中…</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 赛季排名页面 -->
+        <div id="season-page" class="page">
+            <div class="page-heading">
+                <h2>赛季排名 <span class="help-icon" data-tooltip="本页面为赛季排名，以一年为一个赛季将参赛选手在当个赛季的最佳成绩进行排名；所有的排名成绩源自WCA赛事的官方排名。">?</span></h2>
+            </div>
+            <div class="filter-section" id="season-filters">
+                <div class="filter-item">
+                    <label>范围</label>
+                    <select id="season-scope">
+                        <option value="world">世界</option>
+                        <option value="asia">亚洲</option>
+                        <option value="europe">欧洲</option>
+                        <option value="americas">美洲</option>
+                        <option value="africa">非洲</option>
+                        <option value="oceania">大洋洲</option>
+                        <option value="china" selected>中国</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>项目</label>
+                    <select id="season-event"></select>
+                </div>
+                <div class="filter-item">
+                    <label>性别</label>
+                    <select id="season-gender">
+                        <option value="all">所有</option>
+                        <option value="男">男</option>
+                        <option value="女">女</option>
+                        <option value="未知">未知</option>
+                    </select>
+                </div>
+                <div class="btn-group">
+                    <button id="season-single" class="btn btn-warning"><i class="fas fa-stopwatch"></i> 单次</button>
+                    <button id="season-average" class="btn btn-primary"><i class="fas fa-chart-line"></i> 平均</button>
+                </div>
+            </div>
+            <div class="current-info">
+                <h3><i class="fa fa-info-circle" style="color:#4a6ee0;"></i> 当前浏览：<span id="season-current">三阶 - 单次</span></h3>
+            </div>
+            <div class="table-container">
+                <table id="season-table">
+                    <thead>
+                        <tr>
+                            <th>排名</th>
+                            <th>姓名</th>
+                            <th>国家</th>
+                            <th>成绩</th>
+                            <th>比赛</th>
+                        </tr>
+                    </thead>
+                    <tbody id="season-table-body"></tbody>
+                </table>
+            </div>
+            <div class="pagination-container">
+                <ul class="pagination" id="season-pagination"></ul>
+            </div>
+        </div>
+
+        <!-- 现役排名页面 -->
+        <div id="active-page" class="page">
+            <div class="page-heading">
+                <h2>现役排名 <span class="help-icon" data-tooltip="本页面为现役排名，以三年为期，将参赛选手在此期间的最佳成绩进行排名，超过三年无参赛记录的选手我们将认为其选择暂时退役或永久退役，将不被列入排名；所有的排名成绩源自WCA赛事的官方排名。">?</span></h2>
+            </div>
+            <div class="filter-section" id="active-filters">
+                <div class="filter-item">
+                    <label>范围</label>
+                    <select id="active-scope">
+                        <option value="world">世界</option>
+                        <option value="asia">亚洲</option>
+                        <option value="europe">欧洲</option>
+                        <option value="americas">美洲</option>
+                        <option value="africa">非洲</option>
+                        <option value="oceania">大洋洲</option>
+                        <option value="china" selected>中国</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>项目</label>
+                    <select id="active-event"></select>
+                </div>
+                <div class="filter-item">
+                    <label>性别</label>
+                    <select id="active-gender">
+                        <option value="all">所有</option>
+                        <option value="男">男</option>
+                        <option value="女">女</option>
+                        <option value="未知">未知</option>
+                    </select>
+                </div>
+                <div class="btn-group">
+                    <button id="active-single" class="btn btn-warning"><i class="fas fa-stopwatch"></i> 单次</button>
+                    <button id="active-average" class="btn btn-primary"><i class="fas fa-chart-line"></i> 平均</button>
+                </div>
+            </div>
+            <div class="current-info">
+                <h3><i class="fa fa-info-circle" style="color:#4a6ee0;"></i> 当前浏览：<span id="active-current">三阶 - 单次</span></h3>
+            </div>
+            <div class="table-container">
+                <table id="active-table">
+                    <thead>
+                        <tr>
+                            <th>排名</th>
+                            <th>姓名</th>
+                            <th>国家</th>
+                            <th>成绩</th>
+                            <th>比赛</th>
+                        </tr>
+                    </thead>
+                    <tbody id="active-table-body"></tbody>
+                </table>
+            </div>
+            <div class="pagination-container">
+                <ul class="pagination" id="active-pagination"></ul>
+            </div>
+        </div>
+
+        <!-- 省市排名页面 -->
+        <div id="province-page" class="page">
+            <div class="page-heading">
+                <h2>省市排名 <span class="help-icon" data-tooltip="本页面为省市排名，在这里可以查看中国每个省市区域的选手排名，2018年5月下旬前没有在粗饼网选择归属地的选手将自动加入作者虚构的秘境——神手谷；所有的排名成绩源自WCA赛事的官方排名。">?</span></h2>
+            </div>
+            <div class="filter-section" id="province-filters">
+                <div class="filter-item">
+                    <label>数据类型</label>
+                    <select id="province-dataset">
+                        <option value="historical">历史最好</option>
+                        <option value="season">赛季 (2026)</option>
+                        <option value="active">现役 (2024-2026)</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>省份</label>
+                    <select id="province-province">
+                        <option value="all">全部</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>城市</label>
+                    <select id="province-city">
+                        <option value="all">全部</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>项目</label>
+                    <select id="province-event"></select>
+                </div>
+                <div class="filter-item">
+                    <label>性别</label>
+                    <select id="province-gender">
+                        <option value="all">所有</option>
+                        <option value="男">男</option>
+                        <option value="女">女</option>
+                        <option value="未知">未知</option>
+                    </select>
+                </div>
+                <div class="btn-group">
+                    <button id="province-single" class="btn btn-warning"><i class="fas fa-stopwatch"></i> 单次</button>
+                    <button id="province-average" class="btn btn-primary"><i class="fas fa-chart-line"></i> 平均</button>
+                </div>
+            </div>
+            <div class="current-info">
+                <h3><i class="fa fa-info-circle" style="color:#4a6ee0;"></i> 当前浏览：<span id="province-current">历史最好 - 三阶 - 单次</span></h3>
+            </div>
+            <div class="table-container">
+                <table id="province-table">
+                    <thead>
+                        <tr>
+                            <th>排名</th>
+                            <th>姓名</th>
+                            <th>省份</th>
+                            <th>城市</th>
+                            <th>成绩</th>
+                            <th>比赛</th>
+                        </tr>
+                    </thead>
+                    <tbody id="province-table-body"></tbody>
+                </table>
+            </div>
+            <div class="pagination-container">
+                <ul class="pagination" id="province-pagination"></ul>
+            </div>
+        </div>
+
+        <!-- 综合排名页面 -->
+        <div id="comprehensive-page" class="page">
+            <div class="page-heading">
+                <h2>综合排名 <span class="help-icon" data-tooltip="本页面根据您选择的数据源、成绩类型和多个项目，计算选手在所选项目中的平均排名，并据此生成综合排名。">?</span></h2>
+            </div>
+            <div class="filter-section" id="comprehensive-filters">
+                <div class="filter-item">
+                    <label>数据源</label>
+                    <select id="comp-source">
+                        <option value="season">赛季排名</option>
+                        <option value="active">现役排名</option>
+                        <option value="province">省市排名</option>
+                    </select>
+                </div>
+                <!-- 省市数据类型子选项（默认隐藏） -->
+                <div class="filter-item" id="comp-dataset-filter" style="display: none;">
+                    <label>数据类型</label>
+                    <select id="comp-dataset">
+                        <option value="historical">历史最好</option>
+                        <option value="season">赛季 (2026)</option>
+                        <option value="active">现役 (2024-2026)</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>项目 (可多选)</label>
+                    <div id="comp-event-checkboxes" class="checkbox-group">
+                        <!-- 动态生成项目复选框 -->
+                    </div>
+                </div>
+                <div class="filter-item">
+                    <label>性别</label>
+                    <select id="comp-gender">
+                        <option value="all">所有</option>
+                        <option value="男">男</option>
+                        <option value="女">女</option>
+                        <option value="未知">未知</option>
+                    </select>
+                </div>
+                <div class="filter-item" id="comp-province-filter" style="display: none;">
+                    <label>省份</label>
+                    <select id="comp-province">
+                        <option value="all">全部</option>
+                    </select>
+                </div>
+                <div class="filter-item" id="comp-city-filter" style="display: none;">
+                    <label>城市</label>
+                    <select id="comp-city">
+                        <option value="all">全部</option>
+                    </select>
+                </div>
+                <div class="btn-group">
+                    <button id="comp-single" class="btn btn-warning"><i class="fas fa-stopwatch"></i> 单次</button>
+                    <button id="comp-average" class="btn btn-primary"><i class="fas fa-chart-line"></i> 平均</button>
+                </div>
+                <div class="btn-group">
+                    <button id="comp-calculate" class="btn btn-primary"><i class="fas fa-calculator"></i> 计算综合排名</button>
+                </div>
+            </div>
+            <div class="current-info">
+                <h3><i class="fa fa-info-circle" style="color:#4a6ee0;"></i> 当前浏览：<span id="comp-current">请选择数据源和项目后点击计算</span></h3>
+            </div>
+            <div class="table-container">
+                <table id="comp-table">
+                    <thead>
+                        <tr>
+                            <th>综合排名</th>
+                            <th>姓名</th>
+                            <th>国家/省份</th>
+                            <th>城市</th>
+                            <th>平均排名</th>
+                            <th>参与项目数</th>
+                        </tr>
+                    </thead>
+                    <tbody id="comp-table-body"></tbody>
+                </table>
+            </div>
+            <div class="pagination-container">
+                <ul class="pagination" id="comp-pagination"></ul>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div>Copyright @ XCUBING.CN · 成绩数据源自WCA</div>
+    </footer>
+</div>
+
+<script>
+    // ==================== 配置（数据文件路径）====================
+    const DATA_FILES = {
+        announcement: 'announcement.json',
+        seasonGlobal: 'seasonGlobal.json',
+        activeGlobal: 'activeGlobal.json',
+        chineseHistorical: 'chineseHistorical.json',
+        chineseSeason: 'chineseSeason.json',
+        chineseActive: 'chineseActive.json'
+    };
+
+    // 洲际映射
+    const continentMap = {
+        'China':'asia','Japan':'asia','Korea':'asia','India':'asia','Iran':'asia','Thailand':'asia','Singapore':'asia','Malaysia':'asia','Indonesia':'asia','Philippines':'asia','Vietnam':'asia','Taiwan':'asia','Hong Kong':'asia','Macau':'asia',
+        'Russia':'europe','Germany':'europe','France':'europe','UK':'europe','Poland':'europe','Spain':'europe','Italy':'europe','Netherlands':'europe','Sweden':'europe','Denmark':'europe','Norway':'europe','Finland':'europe','Ukraine':'europe','Czech Republic':'europe','Hungary':'europe',
+        'USA':'americas','Canada':'americas','Mexico':'americas','Brazil':'americas','Argentina':'americas','Colombia':'americas','Peru':'americas','Chile':'americas',
+        'South Africa':'africa','Egypt':'africa','Morocco':'africa','Algeria':'africa',
+        'Australia':'oceania','New Zealand':'oceania'
+    };
+
+    // 项目列表
+    const eventList = [
+        {code:'333', name:'三阶'},{code:'222', name:'二阶'},{code:'444', name:'四阶'},{code:'555', name:'五阶'},
+        {code:'666', name:'六阶'},{code:'777', name:'七阶'},{code:'333bf', name:'三盲'},{code:'333fm', name:'最少步'},
+        {code:'333oh', name:'单手'},{code:'clock', name:'魔表'},{code:'minx', name:'五魔方'},{code:'pyram', name:'金字塔'},
+        {code:'skewb', name:'斜转'},{code:'sq1', name:'Square-1'},{code:'444bf', name:'四盲'},{code:'555bf', name:'五盲'},
+        {code:'333mbf', name:'多盲'}
+    ];
+
+    // ==================== 全局函数 ====================
+    async function loadJSON(url) {
+        const response = await fetch(url);
+        return await response.json();
+    }
+
+    function parseTime(timeStr) {
+        if (!timeStr || timeStr === '暂无') return Infinity;
+        if (/^\d+$/.test(timeStr)) {
+            return parseFloat(timeStr) / 100;
+        }
+        if (timeStr.includes(':')) {
+            const parts = timeStr.split(':');
+            if (parts.length === 2) return parseFloat(parts[0]) * 60 + parseFloat(parts[1]);
+        }
+        return parseFloat(timeStr);
+    }
+
+    function formatResult(centiseconds) {
+        if (!centiseconds || centiseconds === '暂无' || centiseconds === '') return '暂无';
+        if (typeof centiseconds === 'string' && centiseconds.includes(':')) return centiseconds;
+        const num = parseFloat(centiseconds);
+        if (isNaN(num) || num <= 0) return '暂无';
+        const totalSeconds = num / 100;
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = (totalSeconds % 60).toFixed(2);
+        if (minutes > 0) {
+            return `${minutes}:${seconds.padStart(5, '0')}`;
+        } else {
+            return seconds;
+        }
+    }
+
+    function filterByScope(data, scope) {
+        if (scope === 'world') return data;
+        if (scope === 'china') return data.filter(item => item['国家'] === 'China');
+        return data.filter(item => continentMap[item['国家']] === scope);
+    }
+
+    function addRanks(data, scoreKey) {
+        const sorted = [...data].sort((a,b) => parseTime(a[scoreKey]) - parseTime(b[scoreKey]));
+        let rank = 1;
+        let lastScore = null;
+        let sameCount = 0;
+        return sorted.map((item, idx) => {
+            const score = item[scoreKey];
+            if (idx === 0) {
+                lastScore = score;
+                return {...item, rank: rank};
+            }
+            if (score === lastScore) {
+                sameCount++;
+                return {...item, rank: rank};
+            } else {
+                rank += 1 + sameCount;
+                sameCount = 0;
+                lastScore = score;
+                return {...item, rank: rank};
+            }
+        });
+    }
+
+    function renderTable(tbodyId, paginationId, data, columns, currentPage, itemsPerPage = 100) {
+        const tbody = document.getElementById(tbodyId);
+        if (!tbody) return;
+        if (!data || data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="100">暂无数据</td></tr>';
+            document.getElementById(paginationId).innerHTML = '';
+            return;
+        }
+        const start = (currentPage - 1) * itemsPerPage;
+        const end = Math.min(start + itemsPerPage, data.length);
+        const pageData = data.slice(start, end);
+
+        tbody.innerHTML = '';
+        pageData.forEach(item => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = columns.map(col => {
+                if (col.key === 'rank') return `<td class="rank-cell">${item.rank}</td>`;
+                if (col.key === '单次成绩(百分之一秒)' || col.key === '平均成绩(百分之一秒)') {
+                    return `<td>${formatResult(item[col.key])}</td>`;
+                }
+                return `<td>${item[col.key] || ''}</td>`;
+            }).join('');
+            tbody.appendChild(tr);
+        });
+
+        const totalPages = Math.ceil(data.length / itemsPerPage);
+        renderPagination(paginationId, currentPage, totalPages, (page) => {
+            window.dispatchEvent(new CustomEvent('pageChange', {detail: {page, tbodyId, paginationId}}));
+        });
+    }
+
+    function renderPagination(paginationId, current, total, onClick) {
+        const ul = document.getElementById(paginationId);
+        if (!ul) return;
+        if (total <= 1) {
+            ul.innerHTML = '';
+            return;
+        }
+        let html = '';
+        const prevDisabled = current === 1 ? 'disabled' : '';
+        html += `<li class="${prevDisabled}"><a data-page="${current-1}" ${prevDisabled ? 'tabindex="-1"' : ''}>前页</a></li>`;
+
+        const maxVisible = 10;
+        let start = Math.max(1, current - Math.floor(maxVisible/2));
+        let end = Math.min(total, start + maxVisible - 1);
+        if (end - start + 1 < maxVisible) {
+            start = Math.max(1, end - maxVisible + 1);
+        }
+
+        if (start > 1) {
+            html += `<li><a data-page="1">1</a></li>`;
+            if (start > 2) html += `<li class="disabled"><span>...</span></li>`;
+        }
+
+        for (let i = start; i <= end; i++) {
+            const active = i === current ? 'active' : '';
+            html += `<li class="${active}"><a data-page="${i}">${i}</a></li>`;
+        }
+
+        if (end < total) {
+            if (end < total - 1) html += `<li class="disabled"><span>...</span></li>`;
+            html += `<li><a data-page="${total}">${total}</a></li>`;
+        }
+
+        const nextDisabled = current === total ? 'disabled' : '';
+        html += `<li class="${nextDisabled}"><a data-page="${current+1}" ${nextDisabled ? 'tabindex="-1"' : ''}>后页</a></li>`;
+
+        ul.innerHTML = html;
+
+        ul.querySelectorAll('a[data-page]').forEach(a => {
+            a.addEventListener('click', (e) => {
+                e.preventDefault();
+                const page = parseInt(a.dataset.page);
+                if (!isNaN(page) && page >= 1 && page <= total && page !== current) {
+                    onClick(page);
+                }
+            });
+        });
+    }
+
+    // ==================== 状态管理 ====================
+    let seasonState = {
+        dataRaw: [],
+        rankedData: [],
+        currentPage: 1,
+        scope: 'china',
+        event: '333',
+        gender: 'all',
+        type: 'single',
+        columns: [
+            {key:'rank', label:'排名'},
+            {key:'姓名', label:'姓名'},
+            {key:'国家', label:'国家'},
+            {key:'单次成绩(百分之一秒)', label:'成绩'},
+            {key:'比赛名称', label:'比赛'}
+        ]
+    };
+    let activeState = {
+        dataRaw: [],
+        rankedData: [],
+        currentPage: 1,
+        scope: 'china',
+        event: '333',
+        gender: 'all',
+        type: 'single',
+        columns: [
+            {key:'rank', label:'排名'},
+            {key:'姓名', label:'姓名'},
+            {key:'国家', label:'国家'},
+            {key:'单次成绩(百分之一秒)', label:'成绩'},
+            {key:'比赛名称', label:'比赛'}
+        ]
+    };
+    let provinceState = {
+        dataRaw: [],
+        rankedData: [],
+        currentPage: 1,
+        dataset: 'historical',
+        province: 'all',
+        city: 'all',
+        event: '333',
+        gender: 'all',
+        type: 'single',
+        columns: [
+            {key:'rank', label:'排名'},
+            {key:'姓名', label:'姓名'},
+            {key:'省份', label:'省份'},
+            {key:'城市', label:'城市'},
+            {key:'单次成绩(百分之一秒)', label:'成绩'},
+            {key:'比赛名称', label:'比赛'}
+        ]
+    };
+
+    // 综合排名状态
+    let compState = {
+        source: 'season',
+        subDataset: 'historical',  // 仅当source='province'时使用
+        selectedEvents: [],
+        gender: 'all',
+        province: 'all',
+        city: 'all',
+        type: 'single',            // 'single' 或 'average'
+        dataRaw: [],
+        rankedData: [],
+        currentPage: 1,
+        columns: [
+            {key:'rank', label:'综合排名'},
+            {key:'姓名', label:'姓名'},
+            {key:'region', label:'国家/省份'},
+            {key:'city', label:'城市'},
+            {key:'avgRank', label:'平均排名'},
+            {key:'eventCount', label:'参与项目数'}
+        ]
+    };
+
+    // ==================== 加载数据 ====================
+    async function loadAllData() {
+        // 加载公告
+        try {
+            const ann = await loadJSON(DATA_FILES.announcement);
+            if (ann.length > 0) {
+                document.getElementById('announcement-text').innerText = ann[0].content || '网站上线试运行中…';
+            }
+        } catch(e) { console.warn('公告加载失败', e); }
+
+        // 加载赛季排名数据
+        try {
+            seasonState.dataRaw = await loadJSON(DATA_FILES.seasonGlobal);
+            applySeasonFilters();
+        } catch(e) { console.warn('赛季数据加载失败', e); }
+
+        // 加载现役排名数据
+        try {
+            activeState.dataRaw = await loadJSON(DATA_FILES.activeGlobal);
+            applyActiveFilters();
+        } catch(e) { console.warn('现役数据加载失败', e); }
+
+        // 加载省市排名数据（初始历史）
+        try {
+            await loadProvinceDataset(provinceState.dataset);
+        } catch(e) { console.warn('省市数据加载失败', e); }
+
+        populateEventSelects();
+        initComprehensive();
+    }
+
+    function populateEventSelects() {
+        const selects = ['season-event', 'active-event', 'province-event'];
+        selects.forEach(id => {
+            const select = document.getElementById(id);
+            if (select) {
+                select.innerHTML = eventList.map(e => `<option value="${e.code}">${e.name}</option>`).join('');
+            }
+        });
+        // 综合排名项目复选框
+        const checkboxDiv = document.getElementById('comp-event-checkboxes');
+        checkboxDiv.innerHTML = eventList.map(e => `
+            <label>
+                <input type="checkbox" value="${e.code}"> ${e.name}
+            </label>
+        `).join('');
+    }
+
+    async function loadProvinceDataset(dataset) {
+        let file;
+        if (dataset === 'historical') file = DATA_FILES.chineseHistorical;
+        else if (dataset === 'season') file = DATA_FILES.chineseSeason;
+        else file = DATA_FILES.chineseActive;
+        provinceState.dataRaw = await loadJSON(file);
+        updateProvinceCityOptions(provinceState.dataRaw);
+        applyProvinceFilters();
+    }
+
+    function updateProvinceCityOptions(data) {
+        const provinces = [...new Set(data.map(d => d['省份']).filter(p => p))].sort();
+        const provinceSelect = document.getElementById('province-province');
+        provinceSelect.innerHTML = '<option value="all">全部</option>' + provinces.map(p => `<option value="${p}">${p}</option>`).join('');
+        const citySelect = document.getElementById('province-city');
+        citySelect.innerHTML = '<option value="all">全部</option>';
+    }
+
+    document.getElementById('province-province')?.addEventListener('change', function() {
+        const selectedProvince = this.value;
+        const citySelect = document.getElementById('province-city');
+        if (selectedProvince === 'all') {
+            citySelect.innerHTML = '<option value="all">全部</option>';
+        } else {
+            const cities = [...new Set(provinceState.dataRaw.filter(d => d['省份'] === selectedProvince).map(d => d['城市']).filter(c => c))].sort();
+            citySelect.innerHTML = '<option value="all">全部</option>' + cities.map(c => `<option value="${c}">${c}</option>`).join('');
+        }
+        provinceState.city = 'all';
+        applyProvinceFilters();
+    });
+
+    // ==================== 筛选与渲染（原有）====================
+    function applySeasonFilters() {
+        let filtered = seasonState.dataRaw;
+        filtered = filterByScope(filtered, seasonState.scope);
+        filtered = filtered.filter(d => d['项目代码'] === seasonState.event);
+        if (seasonState.gender !== 'all') {
+            filtered = filtered.filter(d => d['性别'] === seasonState.gender);
+        }
+        const scoreKey = seasonState.type === 'single' ? '单次成绩(百分之一秒)' : '平均成绩(百分之一秒)';
+        seasonState.rankedData = addRanks(filtered, scoreKey);
+        const eventName = eventList.find(e => e.code === seasonState.event)?.name || seasonState.event;
+        document.getElementById('season-current').innerText = `${eventName} - ${seasonState.type==='single'?'单次':'平均'}`;
+        renderTable('season-table-body', 'season-pagination', seasonState.rankedData, seasonState.columns, seasonState.currentPage);
+    }
+
+    function applyActiveFilters() {
+        let filtered = activeState.dataRaw;
+        filtered = filterByScope(filtered, activeState.scope);
+        filtered = filtered.filter(d => d['项目代码'] === activeState.event);
+        if (activeState.gender !== 'all') {
+            filtered = filtered.filter(d => d['性别'] === activeState.gender);
+        }
+        const scoreKey = activeState.type === 'single' ? '单次成绩(百分之一秒)' : '平均成绩(百分之一秒)';
+        activeState.rankedData = addRanks(filtered, scoreKey);
+        const eventName = eventList.find(e => e.code === activeState.event)?.name || activeState.event;
+        document.getElementById('active-current').innerText = `${eventName} - ${activeState.type==='single'?'单次':'平均'}`;
+        renderTable('active-table-body', 'active-pagination', activeState.rankedData, activeState.columns, activeState.currentPage);
+    }
+
+    function applyProvinceFilters() {
+        let filtered = provinceState.dataRaw;
+        if (provinceState.province !== 'all') {
+            filtered = filtered.filter(d => d['省份'] === provinceState.province);
+        }
+        if (provinceState.city !== 'all') {
+            filtered = filtered.filter(d => d['城市'] === provinceState.city);
+        }
+        filtered = filtered.filter(d => d['项目代码'] === provinceState.event);
+        if (provinceState.gender !== 'all') {
+            filtered = filtered.filter(d => d['性别'] === provinceState.gender);
+        }
+        const scoreKey = provinceState.type === 'single' ? '单次成绩(百分之一秒)' : '平均成绩(百分之一秒)';
+        provinceState.rankedData = addRanks(filtered, scoreKey);
+        const datasetLabel = provinceState.dataset === 'historical' ? '历史最好' : (provinceState.dataset==='season'?'赛季':'现役');
+        const eventName = eventList.find(e => e.code === provinceState.event)?.name || provinceState.event;
+        document.getElementById('province-current').innerText = `${datasetLabel} - ${eventName} - ${provinceState.type==='single'?'单次':'平均'}`;
+        renderTable('province-table-body', 'province-pagination', provinceState.rankedData, provinceState.columns, provinceState.currentPage);
+    }
+
+    // ==================== 综合排名功能 ====================
+    async function initComprehensive() {
+        // 数据源切换
+        document.getElementById('comp-source').addEventListener('change', async function() {
+            compState.source = this.value;
+            // 控制数据类型和省市筛选的显示
+            const datasetFilter = document.getElementById('comp-dataset-filter');
+            const provinceFilter = document.getElementById('comp-province-filter');
+            const cityFilter = document.getElementById('comp-city-filter');
+            if (compState.source === 'province') {
+                datasetFilter.style.display = 'block';
+                // 加载默认历史数据
+                await loadCompSourceData('province', compState.subDataset);
+            } else {
+                datasetFilter.style.display = 'none';
+                provinceFilter.style.display = 'none';
+                cityFilter.style.display = 'none';
+                await loadCompSourceData(compState.source);
+            }
+        });
+
+        // 省市数据类型切换
+        document.getElementById('comp-dataset').addEventListener('change', async function() {
+            compState.subDataset = this.value;
+            if (compState.source === 'province') {
+                await loadCompSourceData('province', compState.subDataset);
+            }
+        });
+
+        // 性别筛选
+        document.getElementById('comp-gender').addEventListener('change', function() {
+            compState.gender = this.value;
+            // 不自动计算，等待用户点击“计算”按钮
+        });
+
+        // 省份切换（仅当source='province'时有效）
+        document.getElementById('comp-province').addEventListener('change', function() {
+            compState.province = this.value;
+            // 更新城市下拉
+            const citySelect = document.getElementById('comp-city');
+            if (compState.province === 'all') {
+                citySelect.innerHTML = '<option value="all">全部</option>';
+            } else {
+                const cities = [...new Set(compState.dataRaw.filter(d => d['省份'] === compState.province).map(d => d['城市']).filter(c => c))].sort();
+                citySelect.innerHTML = '<option value="all">全部</option>' + cities.map(c => `<option value="${c}">${c}</option>`).join('');
+            }
+            compState.city = 'all';
+        });
+
+        document.getElementById('comp-city').addEventListener('change', function() {
+            compState.city = this.value;
+        });
+
+        // 单次/平均切换
+        document.getElementById('comp-single').addEventListener('click', function() {
+            compState.type = 'single';
+            this.classList.add('btn-warning');
+            document.getElementById('comp-average').classList.remove('btn-warning');
+            this.classList.remove('btn-primary');
+            document.getElementById('comp-average').classList.add('btn-primary');
+        });
+        document.getElementById('comp-average').addEventListener('click', function() {
+            compState.type = 'average';
+            this.classList.add('btn-warning');
+            document.getElementById('comp-single').classList.remove('btn-warning');
+            this.classList.remove('btn-primary');
+            document.getElementById('comp-single').classList.add('btn-primary');
+        });
+
+        // 计算按钮
+        document.getElementById('comp-calculate').addEventListener('click', function() {
+            // 获取选中的项目
+            const checkboxes = document.querySelectorAll('#comp-event-checkboxes input[type="checkbox"]:checked');
+            compState.selectedEvents = Array.from(checkboxes).map(cb => cb.value);
+            if (compState.selectedEvents.length === 0) {
+                alert('请至少选择一个项目');
+                return;
+            }
+            calculateComprehensive();
+        });
+
+        // 默认加载赛季数据
+        await loadCompSourceData('season');
+    }
+
+    async function loadCompSourceData(source, subDataset = 'historical') {
+        let file;
+        if (source === 'season') {
+            file = DATA_FILES.seasonGlobal;
+        } else if (source === 'active') {
+            file = DATA_FILES.activeGlobal;
+        } else { // province
+            if (subDataset === 'historical') file = DATA_FILES.chineseHistorical;
+            else if (subDataset === 'season') file = DATA_FILES.chineseSeason;
+            else file = DATA_FILES.chineseActive;
+        }
+
+        try {
+            compState.dataRaw = await loadJSON(file);
+            // 根据数据源显示/隐藏省份城市筛选
+            const provinceFilter = document.getElementById('comp-province-filter');
+            const cityFilter = document.getElementById('comp-city-filter');
+            if (source === 'province') {
+                provinceFilter.style.display = 'block';
+                cityFilter.style.display = 'block';
+                // 更新省份下拉
+                const provinces = [...new Set(compState.dataRaw.map(d => d['省份']).filter(p => p))].sort();
+                const provinceSelect = document.getElementById('comp-province');
+                provinceSelect.innerHTML = '<option value="all">全部</option>' + provinces.map(p => `<option value="${p}">${p}</option>`).join('');
+                // 城市初始全部
+                document.getElementById('comp-city').innerHTML = '<option value="all">全部</option>';
+                compState.province = 'all';
+                compState.city = 'all';
+            } else {
+                provinceFilter.style.display = 'none';
+                cityFilter.style.display = 'none';
+            }
+            // 数据加载后不自动计算，等待用户点击计算
+        } catch(e) {
+            console.warn('加载数据源失败', e);
+        }
+    }
+
+    function calculateComprehensive() {
+        // 根据当前筛选条件过滤数据
+        let filtered = compState.dataRaw;
+
+        // 性别筛选
+        if (compState.gender !== 'all') {
+            filtered = filtered.filter(d => d['性别'] === compState.gender);
+        }
+
+        // 如果数据源是省市，应用省份城市筛选
+        if (compState.source === 'province') {
+            if (compState.province !== 'all') {
+                filtered = filtered.filter(d => d['省份'] === compState.province);
+            }
+            if (compState.city !== 'all') {
+                filtered = filtered.filter(d => d['城市'] === compState.city);
+            }
+        }
+
+        // 确定成绩列
+        const scoreKey = compState.type === 'single' ? '单次成绩(百分之一秒)' : '平均成绩(百分之一秒)';
+
+        // 按选手分组，收集每个选手在所选项目中的成绩
+        const personMap = new Map(); // key: person_id, value: { 姓名, 国家, 省份, 城市, scores: {} }
+
+        filtered.forEach(item => {
+            const event = item['项目代码'];
+            if (!compState.selectedEvents.includes(event)) return;
+            const personId = item['WCA ID'];
+            if (!personMap.has(personId)) {
+                personMap.set(personId, {
+                    name: item['姓名'],
+                    country: item['国家'] || '',
+                    province: item['省份'] || '',
+                    city: item['城市'] || '',
+                    scores: {}
+                });
+            }
+            const person = personMap.get(personId);
+            // 如果同一选手同一项目有多个成绩（理论上应该只有一条最好），取最小的
+            if (!person.scores[event] || parseTime(item[scoreKey]) < parseTime(person.scores[event])) {
+                person.scores[event] = item[scoreKey];
+            }
+        });
+
+        // 对于每个项目，计算所有选手在该项目上的排名（基于成绩）
+        const eventRanks = {}; // event -> { personId: rank }
+        compState.selectedEvents.forEach(event => {
+            const eventData = filtered.filter(d => d['项目代码'] === event);
+            const ranked = addRanks(eventData, scoreKey);
+            eventRanks[event] = {};
+            ranked.forEach(r => {
+                eventRanks[event][r['WCA ID']] = r.rank;
+            });
+        });
+
+        // 计算每个选手的平均排名
+        const compList = [];
+        for (let [personId, person] of personMap.entries()) {
+            let totalRank = 0;
+            let count = 0;
+            compState.selectedEvents.forEach(event => {
+                if (eventRanks[event] && eventRanks[event][personId]) {
+                    totalRank += eventRanks[event][personId];
+                    count++;
+                }
+            });
+            if (count > 0) {
+                compList.push({
+                    personId: personId,
+                    姓名: person.name,
+                    国家: person.country,
+                    省份: person.province,
+                    城市: person.city,
+                    avgRank: totalRank / count,
+                    eventCount: count
+                });
+            }
+        }
+
+        // 按平均排名排序
+        compList.sort((a, b) => a.avgRank - b.avgRank);
+
+        // 添加综合排名（同分同名）
+        let rank = 1;
+        let lastAvg = null;
+        let sameCount = 0;
+        const rankedComp = compList.map((item, idx) => {
+            const avg = item.avgRank;
+            if (idx === 0) {
+                lastAvg = avg;
+                return {...item, rank: rank};
+            }
+            if (avg === lastAvg) {
+                sameCount++;
+                return {...item, rank: rank};
+            } else {
+                rank += 1 + sameCount;
+                sameCount = 0;
+                lastAvg = avg;
+                return {...item, rank: rank};
+            }
+        });
+
+        compState.rankedData = rankedComp;
+        document.getElementById('comp-current').innerText = `综合排名 - 已选${compState.selectedEvents.length}个项目 (${compState.type==='single'?'单次':'平均'})`;
+        renderTable('comp-table-body', 'comp-pagination', rankedComp, compState.columns, compState.currentPage);
+    }
+
+    // ==================== 事件绑定 ====================
+    document.addEventListener('DOMContentLoaded', function() {
+        loadAllData();
+
+        // 导航切换
+        const navItems = document.querySelectorAll('[data-page]');
+        const pages = {
+            home: document.getElementById('home-page'),
+            season: document.getElementById('season-page'),
+            active: document.getElementById('active-page'),
+            province: document.getElementById('province-page'),
+            comprehensive: document.getElementById('comprehensive-page')
+        };
+        function switchPage(pageId) {
+            Object.values(pages).forEach(p => p.classList.remove('active'));
+            if (pages[pageId]) pages[pageId].classList.add('active');
+            navItems.forEach(el => el.classList.remove('active'));
+            document.querySelectorAll(`[data-page="${pageId}"]`).forEach(el => el.classList.add('active'));
+            document.querySelector('.mobile-menu')?.classList.remove('active');
+        }
+        navItems.forEach(el => {
+            el.addEventListener('click', function() {
+                const page = this.dataset.page;
+                switchPage(page);
+            });
+        });
+
+        document.querySelector('.mobile-nav-toggle')?.addEventListener('click', function() {
+            document.querySelector('.mobile-menu')?.classList.toggle('active');
+        });
+
+        // 赛季筛选
+        document.getElementById('season-scope')?.addEventListener('change', function() {
+            seasonState.scope = this.value;
+            seasonState.currentPage = 1;
+            applySeasonFilters();
+        });
+        document.getElementById('season-event')?.addEventListener('change', function() {
+            seasonState.event = this.value;
+            seasonState.currentPage = 1;
+            applySeasonFilters();
+        });
+        document.getElementById('season-gender')?.addEventListener('change', function() {
+            seasonState.gender = this.value;
+            seasonState.currentPage = 1;
+            applySeasonFilters();
+        });
+        document.getElementById('season-single')?.addEventListener('click', function() {
+            seasonState.type = 'single';
+            this.classList.add('btn-warning');
+            document.getElementById('season-average').classList.remove('btn-warning');
+            this.classList.remove('btn-primary');
+            document.getElementById('season-average').classList.add('btn-primary');
+            seasonState.currentPage = 1;
+            applySeasonFilters();
+        });
+        document.getElementById('season-average')?.addEventListener('click', function() {
+            seasonState.type = 'average';
+            this.classList.add('btn-warning');
+            document.getElementById('season-single').classList.remove('btn-warning');
+            this.classList.remove('btn-primary');
+            document.getElementById('season-single').classList.add('btn-primary');
+            seasonState.currentPage = 1;
+            applySeasonFilters();
+        });
+
+        // 现役筛选
+        document.getElementById('active-scope')?.addEventListener('change', function() {
+            activeState.scope = this.value;
+            activeState.currentPage = 1;
+            applyActiveFilters();
+        });
+        document.getElementById('active-event')?.addEventListener('change', function() {
+            activeState.event = this.value;
+            activeState.currentPage = 1;
+            applyActiveFilters();
+        });
+        document.getElementById('active-gender')?.addEventListener('change', function() {
+            activeState.gender = this.value;
+            activeState.currentPage = 1;
+            applyActiveFilters();
+        });
+        document.getElementById('active-single')?.addEventListener('click', function() {
+            activeState.type = 'single';
+            this.classList.add('btn-warning');
+            document.getElementById('active-average').classList.remove('btn-warning');
+            this.classList.remove('btn-primary');
+            document.getElementById('active-average').classList.add('btn-primary');
+            activeState.currentPage = 1;
+            applyActiveFilters();
+        });
+        document.getElementById('active-average')?.addEventListener('click', function() {
+            activeState.type = 'average';
+            this.classList.add('btn-warning');
+            document.getElementById('active-single').classList.remove('btn-warning');
+            this.classList.remove('btn-primary');
+            document.getElementById('active-single').classList.add('btn-primary');
+            activeState.currentPage = 1;
+            applyActiveFilters();
+        });
+
+        // 省市筛选
+        document.getElementById('province-dataset')?.addEventListener('change', async function() {
+            provinceState.dataset = this.value;
+            provinceState.currentPage = 1;
+            await loadProvinceDataset(provinceState.dataset);
+        });
+        document.getElementById('province-province')?.addEventListener('change', function() {
+            provinceState.province = this.value;
+            provinceState.currentPage = 1;
+            applyProvinceFilters();
+        });
+        document.getElementById('province-city')?.addEventListener('change', function() {
+            provinceState.city = this.value;
+            provinceState.currentPage = 1;
+            applyProvinceFilters();
+        });
+        document.getElementById('province-event')?.addEventListener('change', function() {
+            provinceState.event = this.value;
+            provinceState.currentPage = 1;
+            applyProvinceFilters();
+        });
+        document.getElementById('province-gender')?.addEventListener('change', function() {
+            provinceState.gender = this.value;
+            provinceState.currentPage = 1;
+            applyProvinceFilters();
+        });
+        document.getElementById('province-single')?.addEventListener('click', function() {
+            provinceState.type = 'single';
+            this.classList.add('btn-warning');
+            document.getElementById('province-average').classList.remove('btn-warning');
+            this.classList.remove('btn-primary');
+            document.getElementById('province-average').classList.add('btn-primary');
+            provinceState.currentPage = 1;
+            applyProvinceFilters();
+        });
+        document.getElementById('province-average')?.addEventListener('click', function() {
+            provinceState.type = 'average';
+            this.classList.add('btn-warning');
+            document.getElementById('province-single').classList.remove('btn-warning');
+            this.classList.remove('btn-primary');
+            document.getElementById('province-single').classList.add('btn-primary');
+            provinceState.currentPage = 1;
+            applyProvinceFilters();
+        });
+
+        // 分页事件
+        window.addEventListener('pageChange', function(e) {
+            const {page, tbodyId, paginationId} = e.detail;
+            if (tbodyId === 'season-table-body') {
+                seasonState.currentPage = page;
+                renderTable('season-table-body', 'season-pagination', seasonState.rankedData, seasonState.columns, seasonState.currentPage);
+            } else if (tbodyId === 'active-table-body') {
+                activeState.currentPage = page;
+                renderTable('active-table-body', 'active-pagination', activeState.rankedData, activeState.columns, activeState.currentPage);
+            } else if (tbodyId === 'province-table-body') {
+                provinceState.currentPage = page;
+                renderTable('province-table-body', 'province-pagination', provinceState.rankedData, provinceState.columns, provinceState.currentPage);
+            } else if (tbodyId === 'comp-table-body') {
+                compState.currentPage = page;
+                renderTable('comp-table-body', 'comp-pagination', compState.rankedData, compState.columns, compState.currentPage);
+            }
+        });
+    });
+</script>
+</body>
+</html>
