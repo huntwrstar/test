@@ -1,0 +1,17 @@
+{
+  "meta": {
+    "exportedAt": "2026-02-28T07:47:02.943Z",
+    "source": "Excel转JSON工具",
+    "totalRows": 1,
+    "headers": [
+      "title",
+      "content"
+    ]
+  },
+  "data": [
+    {
+      "title": "公告",
+      "content": "上线试运行中……"
+    }
+  ]
+}
