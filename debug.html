@@ -1,0 +1,46 @@
+<!-- 将此内容保存为 index.html 替换原文件，放在同一目录 -->
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>调试页面</title></head>
+<body>
+<h2>XCUBING 数据调试</h2>
+<div id="status">加载中...</div>
+<pre id="output"></pre>
+<script>
+async function test() {
+    const files = [
+        'seasonGlobal.json',
+        'activeGlobal.json',
+        'chineseHistorical.json',
+        'chineseSeason.json',
+        'chineseActive.json',
+        'announcement.json'
+    ];
+    let allOk = true;
+    for (let file of files) {
+        try {
+            const res = await fetch(file);
+            if (!res.ok) {
+                document.getElementById('status').innerHTML = `❌ ${file} 加载失败，HTTP状态码：${res.status}`;
+                return;
+            }
+            const text = await res.text();
+            try {
+                const data = JSON.parse(text);
+                document.getElementById('output').innerHTML += `✅ ${file} 加载成功，数据条数：${data.length}\n`;
+            } catch (e) {
+                document.getElementById('status').innerHTML = `❌ ${file} 不是有效的 JSON：${e.message}`;
+                document.getElementById('output').innerHTML = text.substring(0, 200);
+                return;
+            }
+        } catch (e) {
+            document.getElementById('status').innerHTML = `❌ ${file} 网络错误：${e.message}`;
+            return;
+        }
+    }
+    document.getElementById('status').innerHTML = '✅ 所有文件加载成功！请检查数据条数是否符合预期。';
+}
+test();
+</script>
+</body>
+</html>
