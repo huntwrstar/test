@@ -414,7 +414,6 @@
             province: '全部省份',
             city: '全部城市',
             type: 'single',                     // single / average
-            data: [],                            // 原始数据（缓存？不缓存，动态加载）
             rankedData: [],
             currentPage: 1
         },
@@ -448,12 +447,21 @@
     async function fetchJSON(url) {
         const res = await fetch(url);
         if (!res.ok) throw new Error(`加载失败: ${url}`);
-        return await res.json();
+        const data = await res.json();
+        // 确保每条数据都有 result 字段，防止后续处理出错
+        data.forEach(item => {
+            if (item.result === undefined || item.result === null) {
+                item.result = 'DNF';
+            }
+        });
+        return data;
     }
 
     function formatResultForSort(resultStr) {
+        // 处理 undefined、null、空字符串
+        if (resultStr === undefined || resultStr === null || resultStr === '') return Infinity;
         if (resultStr === 'DNF' || resultStr === '暂无') return Infinity;
-        if (resultStr.includes(':')) {
+        if (typeof resultStr === 'string' && resultStr.includes(':')) {
             const parts = resultStr.split(':');
             return parseFloat(parts[0]) * 60 + parseFloat(parts[1]);
         }
@@ -480,6 +488,8 @@
     }
 
     function recomputeRanks(data, scoreKey) {
+        // 确保 data 是数组且每个元素有 scoreKey 字段
+        data = data.filter(item => item && item[scoreKey] !== undefined);
         data.sort((a,b) => parseTime(a[scoreKey]) - parseTime(b[scoreKey]));
         let rank = 1, lastResult = null, sameCount = 0;
         return data.map((item, idx) => {
@@ -864,13 +874,14 @@
         }
     }
 
-    // ========== 综合排名 ==========
+    // ========== 综合排名（完全按参考文件布局）==========
     function renderComprehensive() {
         return `
             <div class="page-heading">
                 <h2>综合排名 <span class="tooltip-icon" id="comp-tooltip" data-tooltip="根据所选数据源和项目，计算选手在多个项目中的排名总和，并自动生成综合排名（缺失项目采用该项目的最大排名+1作为惩罚）。">?</span></h2>
             </div>
             <div class="filter-section" id="comp-filters">
+                <!-- 数据源 -->
                 <div class="filter-item">
                     <label>数据源</label>
                     <select id="comp-source">
@@ -879,10 +890,12 @@
                         <option value="province">省市排名</option>
                     </select>
                 </div>
+                <!-- 范围（非省市源） -->
                 <div class="filter-item" id="comp-scope-item">
                     <label>范围</label>
                     <select id="comp-scope"></select>
                 </div>
+                <!-- 数据类型（省市源） -->
                 <div class="filter-item hidden" id="comp-dataset-item">
                     <label>数据类型</label>
                     <select id="comp-dataset">
@@ -891,28 +904,33 @@
                         <option value="active">现役 (2024-2026)</option>
                     </select>
                 </div>
-                <div class="filter-item hidden" id="comp-province-item">
-                    <label>省份</label>
-                    <select id="comp-province">
-                        <option value="全部省份">全部省份</option>
-                    </select>
-                </div>
-                <div class="filter-item hidden" id="comp-city-item">
-                    <label>城市</label>
-                    <select id="comp-city">
-                        <option value="全部城市">全部城市</option>
-                    </select>
-                </div>
+                <!-- 项目多选 -->
                 <div class="filter-item" style="flex: 2;">
                     <label>项目（可多选）</label>
                     <div class="checkbox-group" id="comp-project-group">
                         ${projectCheckboxes()}
                     </div>
                 </div>
+                <!-- 性别 -->
                 <div class="filter-item">
                     <label>性别</label>
                     <select id="comp-gender">${genderOptions()}</select>
                 </div>
+                <!-- 省份（省市源） -->
+                <div class="filter-item hidden" id="comp-province-item">
+                    <label>省份</label>
+                    <select id="comp-province">
+                        <option value="全部省份">全部省份</option>
+                    </select>
+                </div>
+                <!-- 城市（省市源） -->
+                <div class="filter-item hidden" id="comp-city-item">
+                    <label>城市</label>
+                    <select id="comp-city">
+                        <option value="全部城市">全部城市</option>
+                    </select>
+                </div>
+                <!-- 单次/平均按钮组 -->
                 <div class="btn-group">
                     <button id="comp-single" class="btn btn-warning"><i class="fas fa-stopwatch"></i> 单次</button>
                     <button id="comp-average" class="btn btn-primary"><i class="fas fa-chart-line"></i> 平均</button>
@@ -922,7 +940,7 @@
                 <h3><i class="fa fa-info-circle"></i> 当前浏览：<span id="comp-current">赛季排名 - 已选1个项目 (单次)</span></h3>
             </div>
             <div class="table-container">
-                <table><thead><tr><th>综合排名</th><th>姓名</th><th>区域</th><th>城市</th><th>总排名和</th><th>参与项目数</th></tr></thead><tbody id="comp-tbody"></tbody></table>
+                <table><thead><tr><th>排名</th><th>姓名</th><th>区域</th><th>参与项目数</th></tr></thead><tbody id="comp-tbody"></tbody></table>
             </div>
             <div class="pagination-container" id="comp-pagination"></div>
         `;
@@ -1055,7 +1073,7 @@
     async function calculateComprehensive() {
         const { source, subDataset, scope, selectedEvents, gender, province, city, type } = state.comprehensive;
         if (selectedEvents.length === 0) {
-            document.getElementById('comp-tbody').innerHTML = '<tr><td colspan="6">请至少选择一个项目</td></tr>';
+            document.getElementById('comp-tbody').innerHTML = '<tr><td colspan="4">请至少选择一个项目</td></tr>';
             return;
         }
 
@@ -1146,7 +1164,6 @@
                     wcaid: wcaid,
                     name: info.name,
                     region: source !== 'province' ? info.country : (info.province || ''),
-                    city: source !== 'province' ? '' : info.city,
                     totalRank: totalRank,
                     eventCount: count
                 });
@@ -1178,7 +1195,7 @@
     function renderComprehensiveTable(data) {
         const tbody = document.getElementById('comp-tbody');
         if (data.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6">暂无数据</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="4">暂无数据</td></tr>';
             return;
         }
 
@@ -1202,8 +1219,6 @@
                 <td class="rank-cell">${item.displayRank}</td>
                 <td>${item.name}</td>
                 <td>${item.region || ''}</td>
-                <td>${item.city || ''}</td>
-                <td>${item.totalRank}</td>
                 <td>${item.eventCount}</td>
             </tr>
         `).join('');
