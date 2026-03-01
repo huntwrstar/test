@@ -819,7 +819,10 @@
                 <h3><i class="fa fa-info-circle"></i> 当前浏览：<span id="region-current-project">三阶</span> - <span id="region-current-type">单次</span> <span id="region-current-period">历史最好</span></h3>
             </div>
             <div class="table-container">
-                <table><thead><tr><th>排名</th><th>姓名</th><th>省份</th><th>城市</th><th>成绩</th><th>比赛</th><th>WCA ID</th></tr></thead><tbody id="region-tbody"></tbody></table>
+                <table id="region-table">
+                    <thead></thead>
+                    <tbody id="region-tbody"></tbody>
+                </table>
             </div>
             <div class="pagination-container" id="region-pagination"></div>
         `;
@@ -938,6 +941,21 @@
         document.getElementById('region-current-type').textContent = type === 'single' ? '单次' : '平均';
         document.getElementById('region-current-period').textContent = 
             period === 'historical' ? '历史最好' : (period === 'season' ? '赛季' : '现役');
+
+        // 动态更新表头
+        const thead = document.querySelector('#region-table thead');
+        if (thead) {
+            const showCompetition = period !== 'historical';
+            thead.innerHTML = `<tr>
+                <th>排名</th>
+                <th>姓名</th>
+                <th>省份</th>
+                <th>城市</th>
+                <th>成绩</th>
+                ${showCompetition ? '<th>比赛</th>' : ''}
+                <th>WCA ID</th>
+            </tr>`;
+        }
 
         try {
             let data = await fetchJSON(`data/region/${period}/${type}/${project}.json`);
@@ -1530,17 +1548,21 @@
     function renderTableBody(tbody, data, regionMode) {
         if (!tbody) return;
         if (regionMode) {
-            tbody.innerHTML = data.map(item => `
-                <tr>
+            const period = state.region.period;
+            const showCompetition = period !== 'historical';
+            tbody.innerHTML = data.map(item => {
+                let row = `<tr>
                     <td class="rank-cell">${item.displayRank || item.rank}</td>
                     <td>${item.name}</td>
                     <td>${item.province || ''}</td>
                     <td>${item.city || ''}</td>
-                    <td>${formatResult(item.result)}</td>
-                    <td>${item.competition || ''}</td>
-                    <td>${item.wcaid}</td>
-                </tr>
-            `).join('');
+                    <td>${formatResult(item.result)}</td>`;
+                if (showCompetition) {
+                    row += `<td>${item.competition || ''}</td>`;
+                }
+                row += `<td>${item.wcaid}</td></tr>`;
+                return row;
+            }).join('');
         } else {
             tbody.innerHTML = data.map(item => `
                 <tr>
