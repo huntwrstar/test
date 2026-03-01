@@ -7,70 +7,359 @@
     <link rel="icon" href="logo.png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* ========== 样式与之前相同，此处省略以节省篇幅，实际使用请保留完整样式 ========== */
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; }
-        body { background-color: #f2f5f9; color: #333; line-height: 1.5; min-height: 100vh; display: flex; flex-direction: column; }
-        .wrapper { max-width: 1200px; margin: 20px auto; background-color: #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.05); width: 100%; }
-        .header { background-color: #ffffff; border-bottom: 2px solid #e9ecef; padding: 15px 30px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; }
-        .logo-area { display: flex; align-items: center; gap: 10px; }
-        .logo-area h1 { font-size: 1.8rem; font-weight: 600; color: #2c3e50; }
-        .logo-area span { font-size: 1rem; color: #7f8c8d; }
-        .main-nav { background-color: #ffffff; border-bottom: 1px solid #dee2e6; padding: 0 30px; }
-        .nav-container { display: flex; gap: 30px; }
-        .nav-item { display: inline-block; padding: 12px 0; color: #495057; text-decoration: none; font-weight: 600; border-bottom: 3px solid transparent; }
-        .nav-item:hover, .nav-item.active { color: #4a6ee0; border-bottom-color: #4a6ee0; }
-        .mobile-menu-icon { display: none; font-size: 1.8rem; cursor: pointer; color: #4a6ee0; }
-        .mobile-nav { display: none; flex-direction: column; background-color: #f8f9fa; border-top: 1px solid #dee2e6; }
-        .mobile-nav .nav-item { padding: 12px 30px; border-bottom: 1px solid #e9ecef; }
+        /* ========== 全局重置 ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+        body {
+            background-color: #f2f5f9;
+            color: #333;
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .wrapper {
+            max-width: 1200px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            width: 100%;
+        }
+        .header {
+            background-color: #ffffff;
+            border-bottom: 2px solid #e9ecef;
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo-area h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        .logo-area span {
+            font-size: 1rem;
+            color: #7f8c8d;
+        }
+        .main-nav {
+            background-color: #ffffff;
+            border-bottom: 1px solid #dee2e6;
+            padding: 0 30px;
+        }
+        .nav-container {
+            display: flex;
+            gap: 30px;
+        }
+        .nav-item {
+            display: inline-block;
+            padding: 12px 0;
+            color: #495057;
+            text-decoration: none;
+            font-weight: 600;
+            border-bottom: 3px solid transparent;
+        }
+        .nav-item:hover,
+        .nav-item.active {
+            color: #4a6ee0;
+            border-bottom-color: #4a6ee0;
+        }
+        .mobile-menu-icon {
+            display: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: #4a6ee0;
+        }
+        .mobile-nav {
+            display: none;
+            flex-direction: column;
+            background-color: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+        }
+        .mobile-nav .nav-item {
+            padding: 12px 30px;
+            border-bottom: 1px solid #e9ecef;
+        }
         @media (max-width: 768px) {
             .nav-container { display: none; }
             .mobile-menu-icon { display: block; }
             .mobile-nav.show { display: flex; }
         }
-        .content { padding: 30px; }
-        .page-heading { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #e9ecef; padding-bottom: 12px; }
-        .page-heading h2 { font-size: 1.8rem; font-weight: 600; color: #2c3e50; display: flex; align-items: center; gap: 10px; }
-        .tooltip-icon { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background-color: #6c757d; color: white; font-size: 1rem; cursor: pointer; position: relative; }
-        .tooltip-icon.active::after { content: attr(data-tooltip); position: absolute; top: 30px; left: 0; background-color: #333; color: #fff; padding: 8px 12px; border-radius: 4px; white-space: nowrap; font-size: 0.85rem; z-index: 10; box-shadow: 0 2px 8px rgba(0,0,0,0.2); animation: fadeOut 6s forwards; }
-        @keyframes fadeOut { 0% { opacity: 1; } 80% { opacity: 1; } 100% { opacity: 0; display: none; } }
-        @media (max-width: 768px) { .tooltip-icon.active::after { white-space: normal; width: 200px; } }
-        .filter-section { display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-end; background-color: #ffffff; border: 1px solid #dee2e6; padding: 20px 25px; margin-bottom: 25px; }
-        .filter-item { display: flex; flex-direction: column; min-width: 160px; flex: 1 1 auto; }
-        .filter-item label { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; color: #6c757d; margin-bottom: 5px; }
-        select, input { width: 100%; padding: 10px 12px; border: 1px solid #ced4da; background-color: white; font-size: 1rem; }
-        select:disabled { background-color: #e9ecef; cursor: not-allowed; }
-        .checkbox-group { display: flex; flex-wrap: wrap; gap: 8px 16px; padding: 10px; border: 1px solid #ced4da; background-color: white; max-height: 200px; overflow-y: auto; }
-        .checkbox-group label { display: flex; align-items: center; gap: 4px; font-weight: normal; text-transform: none; color: #333; width: calc(33.33% - 16px); min-width: 100px; }
-        .radio-group { display: flex; gap: 15px; align-items: center; padding: 5px 0; }
-        .radio-group label { display: flex; align-items: center; gap: 5px; font-weight: normal; text-transform: none; color: #333; }
-        .btn-group { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
-        .btn { padding: 10px 24px; border: 1px solid transparent; font-weight: 600; font-size: 0.95rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; background-color: #f8f9fa; border-color: #ced4da; color: #495057; }
-        .btn-primary { background-color: #4a6ee0; border-color: #4a6ee0; color: white; }
+        .content {
+            padding: 30px;
+        }
+        .page-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #e9ecef;
+            padding-bottom: 12px;
+        }
+        .page-heading h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .tooltip-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: #6c757d;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            position: relative;
+        }
+        .tooltip-icon.active::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            top: 30px;
+            left: 0;
+            background-color: #333;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 4px;
+            white-space: nowrap;
+            font-size: 0.85rem;
+            z-index: 10;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            animation: fadeOut 6s forwards;
+        }
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { opacity: 0; display: none; }
+        }
+        @media (max-width: 768px) {
+            .tooltip-icon.active::after {
+                white-space: normal;
+                width: 200px;
+            }
+        }
+        .filter-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: flex-end;
+            background-color: #ffffff;
+            border: 1px solid #dee2e6;
+            padding: 20px 25px;
+            margin-bottom: 25px;
+        }
+        .filter-item {
+            display: flex;
+            flex-direction: column;
+            min-width: 160px;
+            flex: 1 1 auto;
+        }
+        .filter-item label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+        select, input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ced4da;
+            background-color: white;
+            font-size: 1rem;
+        }
+        select:disabled {
+            background-color: #e9ecef;
+            cursor: not-allowed;
+        }
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 16px;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            background-color: white;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: normal;
+            text-transform: none;
+            color: #333;
+            width: calc(33.33% - 16px);
+            min-width: 100px;
+        }
+        .radio-group {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            padding: 5px 0;
+        }
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: normal;
+            text-transform: none;
+            color: #333;
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 10px 24px;
+            border: 1px solid transparent;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: #f8f9fa;
+            border-color: #ced4da;
+            color: #495057;
+        }
+        .btn-primary {
+            background-color: #4a6ee0;
+            border-color: #4a6ee0;
+            color: white;
+        }
         .btn-primary:hover { background-color: #3a5ecf; }
-        .btn-warning { background-color: #f39c12; border-color: #e67e22; color: white; }
+        .btn-warning {
+            background-color: #f39c12;
+            border-color: #e67e22;
+            color: white;
+        }
         .btn-warning:hover { background-color: #e67e22; }
-        .current-info { background-color: #f8f9fc; border-left: 5px solid #4a6ee0; padding: 14px 20px; margin-bottom: 25px; border: 1px solid #e9ecef; border-left-width: 5px; display: flex; align-items: center; justify-content: space-between; }
-        .current-info h3 { font-weight: 500; color: #2c3e50; margin: 0; display: flex; align-items: center; gap: 8px; }
-        .table-container { overflow-x: auto; border: 1px solid #dee2e6; margin-bottom: 25px; }
-        table { width: 100%; border-collapse: collapse; background-color: white; }
-        th { background-color: #f8f9fa; color: #2c3e50; font-weight: 600; padding: 14px 12px; border-bottom: 2px solid #dee2e6; border-right: 1px solid #dee2e6; text-align: left; white-space: nowrap; }
+        .current-info {
+            background-color: #f8f9fc;
+            border-left: 5px solid #4a6ee0;
+            padding: 14px 20px;
+            margin-bottom: 25px;
+            border: 1px solid #e9ecef;
+            border-left-width: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .current-info h3 {
+            font-weight: 500;
+            color: #2c3e50;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .table-container {
+            overflow-x: auto;
+            border: 1px solid #dee2e6;
+            margin-bottom: 25px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+        }
+        th {
+            background-color: #f8f9fa;
+            color: #2c3e50;
+            font-weight: 600;
+            padding: 14px 12px;
+            border-bottom: 2px solid #dee2e6;
+            border-right: 1px solid #dee2e6;
+            text-align: left;
+            white-space: nowrap;
+        }
         th:last-child { border-right: none; }
-        td { padding: 12px 12px; border-bottom: 1px solid #e9ecef; border-right: 1px solid #e9ecef; white-space: nowrap; }
+        td {
+            padding: 12px 12px;
+            border-bottom: 1px solid #e9ecef;
+            border-right: 1px solid #e9ecef;
+            white-space: nowrap;
+        }
         td:last-child { border-right: none; }
         tbody tr:nth-child(even) { background-color: #fdfdfe; }
         tbody tr:hover { background-color: #f1f5ff; }
         .rank-cell { font-weight: 700; color: #4a6ee0; text-align: center; }
-        .pagination-container { display: flex; justify-content: center; margin-top: 30px; }
-        .pagination { display: flex; list-style: none; gap: 5px; flex-wrap: wrap; justify-content: center; }
-        .pagination li a, .pagination li span { display: block; padding: 6px 10px; border: 1px solid #dee2e6; color: #4a6ee0; background-color: white; text-decoration: none; font-size: 0.9rem; cursor: pointer; }
-        @media (max-width: 480px) { .pagination li a, .pagination li span { padding: 4px 8px; font-size: 0.8rem; } }
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        .pagination {
+            display: flex;
+            list-style: none;
+            gap: 5px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .pagination li a, .pagination li span {
+            display: block;
+            padding: 6px 10px;
+            border: 1px solid #dee2e6;
+            color: #4a6ee0;
+            background-color: white;
+            text-decoration: none;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        @media (max-width: 480px) {
+            .pagination li a, .pagination li span {
+                padding: 4px 8px;
+                font-size: 0.8rem;
+            }
+        }
         .pagination li a:hover { background-color: #e9ecef; }
-        .pagination li.active a, .pagination li.active span { background-color: #4a6ee0; border-color: #4a6ee0; color: white; font-weight: 600; }
-        .pagination li.disabled a, .pagination li.disabled span { color: #adb5bd; pointer-events: none; background-color: #f8f9fa; }
-        .announcement { background-color: #e8f4fd; border: 1px solid #b8daff; padding: 20px; margin: 20px 0; }
+        .pagination li.active a,
+        .pagination li.active span {
+            background-color: #4a6ee0;
+            border-color: #4a6ee0;
+            color: white;
+            font-weight: 600;
+        }
+        .pagination li.disabled a,
+        .pagination li.disabled span {
+            color: #adb5bd;
+            pointer-events: none;
+            background-color: #f8f9fa;
+        }
+        .announcement {
+            background-color: #e8f4fd;
+            border: 1px solid #b8daff;
+            padding: 20px;
+            margin: 20px 0;
+        }
         .announcement h3 { color: #004085; margin-bottom: 10px; }
         .announcement a { color: #004085; text-decoration: underline; }
-        .footer { background-color: #f8f9fa; border-top: 1px solid #dee2e6; padding: 20px 30px; text-align: center; color: #6c757d; font-size: 0.9rem; }
+        .footer {
+            background-color: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            padding: 20px 30px;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
         .footer a { color: #4a6ee0; text-decoration: none; }
         .hidden { display: none !important; }
     </style>
@@ -163,7 +452,6 @@
             throw new Error(`加载失败: ${url}`);
         }
         const data = await res.json();
-        // meta.json 是对象，不是数组，因此不输出 length
         if (Array.isArray(data)) {
             console.log(`加载成功: ${url} 共 ${data.length} 条记录`);
             if (data.length > 0) {
@@ -171,17 +459,10 @@
             } else {
                 console.warn(`警告: ${url} 返回空数组`);
             }
-            // 确保每条数据都有 result 字段
+            // 确保每条数据都有 result 字段（以防万一）
             data.forEach(item => {
                 if (item.result === undefined || item.result === null) {
-                    // 如果数据中原本有 '单次成绩(百分之一秒)' 或 '平均成绩(百分之一秒)'，则映射到 result
-                    if (item['单次成绩(百分之一秒)'] !== undefined) {
-                        item.result = item['单次成绩(百分之一秒)'];
-                    } else if (item['平均成绩(百分之一秒)'] !== undefined) {
-                        item.result = item['平均成绩(百分之一秒)'];
-                    } else {
-                        item.result = 'DNF';
-                    }
+                    item.result = 'DNF';
                 }
             });
         } else {
@@ -204,10 +485,15 @@
         return formatResultForSort(timeStr);
     }
 
-    function formatResult(centiseconds) {
-        if (!centiseconds || centiseconds === '暂无' || centiseconds === '') return '暂无';
-        if (typeof centiseconds === 'string' && centiseconds.includes(':')) return centiseconds;
-        const num = parseFloat(centiseconds);
+    // 修正后的成绩格式化函数
+    function formatResult(resultStr) {
+        if (!resultStr || resultStr === 'DNF' || resultStr === '暂无') return '暂无';
+        // 如果已经是可读格式（包含 : 或 . 且不是纯数字），直接返回
+        if (typeof resultStr === 'string' && (resultStr.includes(':') || resultStr.includes('.')) && !/^\d+$/.test(resultStr)) {
+            return resultStr;
+        }
+        // 否则尝试转换为数字（百分之一秒）
+        const num = parseFloat(resultStr);
         if (isNaN(num) || num <= 0) return '暂无';
         const totalSeconds = num / 100;
         const minutes = Math.floor(totalSeconds / 60);
@@ -219,7 +505,6 @@
         }
     }
 
-    // 统一使用 result 字段进行排名
     function recomputeRanks(data) {
         data = data.filter(item => item && item.result !== undefined);
         console.log(`recomputeRanks: 过滤后数据 ${data.length} 条`);
@@ -853,7 +1138,7 @@
         const currentSpan = document.getElementById('comp-current');
         if (currentSpan) currentSpan.innerText = `${sourceName} - 已选${selectedEvents.length}个项目 (${type==='single'?'单次':'平均'})`;
 
-        const projectDataMap = {}; // 项目代码 -> { rankMap: { wcaid: rank }, maxRank: 该项目的最大排名（即人数） }
+        const projectDataMap = {};
         const personInfoMap = new Map();
 
         console.log(`综合排名开始计算，数据源: ${source}, 子类型: ${subDataset}, 项目: ${selectedEvents.join(',')}`);
@@ -908,7 +1193,6 @@
                     }
                 });
 
-                // 使用 recomputeRanks 计算排名
                 const ranked = recomputeRanks(data);
                 const rankMap = {};
                 ranked.forEach(item => {
