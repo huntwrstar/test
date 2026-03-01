@@ -95,6 +95,41 @@
             .mobile-menu-icon { display: block; }
             .mobile-nav.show { display: flex; }
         }
+/* 手机端：logo 区域不换行、自动适配字体 */
+@media (max-width: 640px) {
+    .header {
+        padding: 12px 20px;          /* 适当缩小两侧内边距 */
+    }
+    .logo-area {
+        gap: 6px;                    /* 缩小标题与标语间距 */
+    }
+    .logo-area h1 {
+        font-size: 1.4rem;           /* 缩小主标题 */
+        white-space: nowrap;          /* 强制不换行 */
+    }
+    .logo-area span {
+        font-size: 0.85rem;           /* 缩小标语 */
+        white-space: nowrap;
+    }
+}
+
+@media (max-width: 480px) {
+    .logo-area h1 {
+        font-size: 1.2rem;
+    }
+    .logo-area span {
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .logo-area h1 {
+        font-size: 1rem;
+    }
+    .logo-area span {
+        font-size: 0.65rem;
+    }
+}
         .content {
             padding: 30px;
         }
