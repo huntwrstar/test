@@ -1,0 +1,1404 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XCUBING · 魔方排名网</title>
+    <link rel="icon" href="logo.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ========== 全局重置 ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+        body {
+            background-color: #f2f5f9;
+            color: #333;
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .wrapper {
+            max-width: 1200px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            width: 100%;
+        }
+        .header {
+            background-color: #ffffff;
+            border-bottom: 2px solid #e9ecef;
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo-area h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        .logo-area span {
+            font-size: 1rem;
+            color: #7f8c8d;
+        }
+        .main-nav {
+            background-color: #ffffff;
+            border-bottom: 1px solid #dee2e6;
+            padding: 0 30px;
+        }
+        .nav-container {
+            display: flex;
+            gap: 30px;
+        }
+        .nav-item {
+            display: inline-block;
+            padding: 12px 0;
+            color: #495057;
+            text-decoration: none;
+            font-weight: 600;
+            border-bottom: 3px solid transparent;
+        }
+        .nav-item:hover,
+        .nav-item.active {
+            color: #4a6ee0;
+            border-bottom-color: #4a6ee0;
+        }
+        .mobile-menu-icon {
+            display: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: #4a6ee0;
+        }
+        .mobile-nav {
+            display: none;
+            flex-direction: column;
+            background-color: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+        }
+        .mobile-nav .nav-item {
+            padding: 12px 30px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        @media (max-width: 768px) {
+            .nav-container { display: none; }
+            .mobile-menu-icon { display: block; }
+            .mobile-nav.show { display: flex; }
+        }
+        .content {
+            padding: 30px;
+        }
+        .page-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #e9ecef;
+            padding-bottom: 12px;
+        }
+        .page-heading h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .tooltip-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: #6c757d;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            position: relative;
+        }
+        .tooltip-icon.active::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            top: 30px;
+            left: 0;
+            background-color: #333;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 4px;
+            white-space: nowrap;
+            font-size: 0.85rem;
+            z-index: 10;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            animation: fadeOut 6s forwards;
+        }
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { opacity: 0; display: none; }
+        }
+        @media (max-width: 768px) {
+            .tooltip-icon.active::after {
+                white-space: normal;
+                width: 200px;
+            }
+        }
+        .filter-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: flex-end;
+            background-color: #ffffff;
+            border: 1px solid #dee2e6;
+            padding: 20px 25px;
+            margin-bottom: 25px;
+        }
+        .filter-item {
+            display: flex;
+            flex-direction: column;
+            min-width: 160px;
+            flex: 1 1 auto;
+        }
+        .filter-item label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+        select, input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ced4da;
+            background-color: white;
+            font-size: 1rem;
+        }
+        select:disabled {
+            background-color: #e9ecef;
+            cursor: not-allowed;
+        }
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 16px;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            background-color: white;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: normal;
+            text-transform: none;
+            color: #333;
+            width: calc(33.33% - 16px);
+            min-width: 100px;
+        }
+        .radio-group {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            padding: 5px 0;
+        }
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: normal;
+            text-transform: none;
+            color: #333;
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 10px 24px;
+            border: 1px solid transparent;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: #f8f9fa;
+            border-color: #ced4da;
+            color: #495057;
+        }
+        .btn-primary {
+            background-color: #4a6ee0;
+            border-color: #4a6ee0;
+            color: white;
+        }
+        .btn-primary:hover { background-color: #3a5ecf; }
+        .btn-warning {
+            background-color: #f39c12;
+            border-color: #e67e22;
+            color: white;
+        }
+        .btn-warning:hover { background-color: #e67e22; }
+        .current-info {
+            background-color: #f8f9fc;
+            border-left: 5px solid #4a6ee0;
+            padding: 14px 20px;
+            margin-bottom: 25px;
+            border: 1px solid #e9ecef;
+            border-left-width: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .current-info h3 {
+            font-weight: 500;
+            color: #2c3e50;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .table-container {
+            overflow-x: auto;
+            border: 1px solid #dee2e6;
+            margin-bottom: 25px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+        }
+        th {
+            background-color: #f8f9fa;
+            color: #2c3e50;
+            font-weight: 600;
+            padding: 14px 12px;
+            border-bottom: 2px solid #dee2e6;
+            border-right: 1px solid #dee2e6;
+            text-align: left;
+            white-space: nowrap;
+        }
+        th:last-child { border-right: none; }
+        td {
+            padding: 12px 12px;
+            border-bottom: 1px solid #e9ecef;
+            border-right: 1px solid #e9ecef;
+            white-space: nowrap;
+        }
+        td:last-child { border-right: none; }
+        tbody tr:nth-child(even) { background-color: #fdfdfe; }
+        tbody tr:hover { background-color: #f1f5ff; }
+        .rank-cell { font-weight: 700; color: #4a6ee0; text-align: center; }
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        .pagination {
+            display: flex;
+            list-style: none;
+            gap: 5px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .pagination li a, .pagination li span {
+            display: block;
+            padding: 6px 10px;
+            border: 1px solid #dee2e6;
+            color: #4a6ee0;
+            background-color: white;
+            text-decoration: none;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        @media (max-width: 480px) {
+            .pagination li a, .pagination li span {
+                padding: 4px 8px;
+                font-size: 0.8rem;
+            }
+        }
+        .pagination li a:hover { background-color: #e9ecef; }
+        .pagination li.active a,
+        .pagination li.active span {
+            background-color: #4a6ee0;
+            border-color: #4a6ee0;
+            color: white;
+            font-weight: 600;
+        }
+        .pagination li.disabled a,
+        .pagination li.disabled span {
+            color: #adb5bd;
+            pointer-events: none;
+            background-color: #f8f9fa;
+        }
+        .announcement {
+            background-color: #e8f4fd;
+            border: 1px solid #b8daff;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .announcement h3 { color: #004085; margin-bottom: 10px; }
+        .announcement a { color: #004085; text-decoration: underline; }
+        .footer {
+            background-color: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            padding: 20px 30px;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        .footer a { color: #4a6ee0; text-decoration: none; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <header class="header">
+        <div class="logo-area">
+            <h1>XCUBING · 魔方排名网</h1>
+            <span>探索未来，未来已来</span>
+        </div>
+    </header>
+
+    <nav class="main-nav">
+        <div class="nav-container" id="desktop-nav">
+            <a href="#home" class="nav-item" data-page="home">首页</a>
+            <a href="#season" class="nav-item" data-page="season">赛季排名</a>
+            <a href="#active" class="nav-item" data-page="active">现役排名</a>
+            <a href="#region" class="nav-item" data-page="region">省市排名</a>
+            <a href="#comprehensive" class="nav-item" data-page="comprehensive">综合排名</a>
+        </div>
+        <div class="mobile-menu-icon" id="mobile-menu-icon">☰</div>
+        <div class="mobile-nav" id="mobile-nav"></div>
+    </nav>
+
+    <div class="content" id="app"></div>
+
+    <footer class="footer">
+        <div>Copyright © XCUBING.CN · 成绩数据源自WCA · <a href="https://docs.qq.com/sheet/xxx" target="_blank">编辑公告</a></div>
+    </footer>
+</div>
+
+<script>
+    // ========== 全局状态 ==========
+    const state = {
+        currentPage: 'home',
+        meta: null,
+        season: { project: '333', type: 'single', scope: 'country:China', gender: 'all', continent: '', country: 'China' },
+        active: { project: '333', type: 'single', scope: 'country:China', gender: 'all', continent: '', country: 'China' },
+        region: { 
+            project: '333', type: 'single', period: 'historical', 
+            province: '北京', city: '全部城市', gender: 'all',
+            allProvinces: [],
+            provinceCities: {}
+        },
+        comprehensive: { 
+            source: 'season',                 // season, active, province
+            subDataset: 'historical',          // 当source=province时使用
+            scope: 'country:China',            // 范围（用于非省市）
+            selectedEvents: ['333'],            // 选中的项目
+            gender: 'all',
+            province: '全部省份',
+            city: '全部城市',
+            type: 'single',                     // single / average
+            data: [],                            // 原始数据（缓存？不缓存，动态加载）
+            rankedData: [],
+            currentPage: 1
+        },
+        pagination: { currentPage: 1, totalPages: 1, data: [] },
+        tooltipTimer: null
+    };
+
+    // 直辖市和特别行政区列表（城市下拉禁用）
+    const MUNICIPALITIES = ['北京', '上海', '重庆', '天津', '台湾', '香港', '澳门'];
+
+    // 项目列表
+    const PROJECT_LIST = [
+        {code:'333', name:'三阶'},{code:'222', name:'二阶'},{code:'444', name:'四阶'},{code:'555', name:'五阶'},
+        {code:'666', name:'六阶'},{code:'777', name:'七阶'},{code:'333bf', name:'三盲'},{code:'333fm', name:'最少步'},
+        {code:'333oh', name:'单手'},{code:'clock', name:'魔表'},{code:'minx', name:'五魔方'},{code:'pyram', name:'金字塔'},
+        {code:'skewb', name:'斜转'},{code:'sq1', name:'Square-1'},{code:'444bf', name:'四盲'},{code:'555bf', name:'五盲'},
+        {code:'333mbf', name:'多盲'}
+    ];
+
+    // 洲际映射（用于范围筛选）
+    const CONTINENT_MAP = {
+        'China':'亚洲', 'Taiwan':'亚洲', 'Hong Kong':'亚洲', 'Macau':'亚洲',
+        'Japan':'亚洲', 'Korea':'亚洲', 'India':'亚洲', 'Iran':'亚洲', 'Thailand':'亚洲', 'Singapore':'亚洲', 'Malaysia':'亚洲', 'Indonesia':'亚洲', 'Philippines':'亚洲', 'Vietnam':'亚洲',
+        'Russia':'欧洲', 'Germany':'欧洲', 'France':'欧洲', 'UK':'欧洲', 'Poland':'欧洲', 'Spain':'欧洲', 'Italy':'欧洲', 'Netherlands':'欧洲', 'Sweden':'欧洲', 'Denmark':'欧洲', 'Norway':'欧洲', 'Finland':'欧洲', 'Ukraine':'欧洲', 'Czech Republic':'欧洲', 'Hungary':'欧洲',
+        'USA':'北美洲', 'Canada':'北美洲', 'Mexico':'北美洲', 'Brazil':'南美洲', 'Argentina':'南美洲', 'Colombia':'南美洲', 'Peru':'南美洲', 'Chile':'南美洲',
+        'South Africa':'非洲', 'Egypt':'非洲', 'Morocco':'非洲', 'Algeria':'非洲',
+        'Australia':'大洋洲', 'New Zealand':'大洋洲'
+    };
+
+    // ========== 工具函数 ==========
+    async function fetchJSON(url) {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`加载失败: ${url}`);
+        return await res.json();
+    }
+
+    function formatResultForSort(resultStr) {
+        if (resultStr === 'DNF' || resultStr === '暂无') return Infinity;
+        if (resultStr.includes(':')) {
+            const parts = resultStr.split(':');
+            return parseFloat(parts[0]) * 60 + parseFloat(parts[1]);
+        }
+        return parseFloat(resultStr);
+    }
+
+    function parseTime(timeStr) {
+        return formatResultForSort(timeStr);
+    }
+
+    function formatResult(centiseconds) {
+        if (!centiseconds || centiseconds === '暂无' || centiseconds === '') return '暂无';
+        if (typeof centiseconds === 'string' && centiseconds.includes(':')) return centiseconds;
+        const num = parseFloat(centiseconds);
+        if (isNaN(num) || num <= 0) return '暂无';
+        const totalSeconds = num / 100;
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = (totalSeconds % 60).toFixed(2);
+        if (minutes > 0) {
+            return `${minutes}:${seconds.padStart(5, '0')}`;
+        } else {
+            return seconds;
+        }
+    }
+
+    function recomputeRanks(data, scoreKey) {
+        data.sort((a,b) => parseTime(a[scoreKey]) - parseTime(b[scoreKey]));
+        let rank = 1, lastResult = null, sameCount = 0;
+        return data.map((item, idx) => {
+            const res = item[scoreKey];
+            if (idx === 0) {
+                lastResult = res;
+                return { ...item, rank: rank };
+            }
+            if (res === lastResult) {
+                sameCount++;
+                return { ...item, rank: rank };
+            } else {
+                rank += 1 + sameCount;
+                sameCount = 0;
+                lastResult = res;
+                return { ...item, rank: rank };
+            }
+        });
+    }
+
+    function paginate(data, page, pageSize = 100) {
+        const start = (page - 1) * pageSize;
+        return data.slice(start, start + pageSize);
+    }
+
+    function renderPagination(containerId, totalPages, currentPage, callback) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        if (totalPages <= 1) {
+            container.innerHTML = '';
+            return;
+        }
+        let html = '<ul class="pagination">';
+        const prevDisabled = currentPage === 1 ? 'disabled' : '';
+        html += `<li class="${prevDisabled}"><a href="#" data-page="${currentPage-1}"><i class="fa fa-angle-left"></i> 前页</a></li>`;
+        const maxVisible = 8;
+        let start = Math.max(1, currentPage - Math.floor(maxVisible/2));
+        let end = Math.min(totalPages, start + maxVisible - 1);
+        if (end - start + 1 < maxVisible) {
+            start = Math.max(1, end - maxVisible + 1);
+        }
+        if (start > 1) {
+            html += `<li><a href="#" data-page="1">1</a></li>`;
+            if (start > 2) html += `<li class="disabled"><span>...</span></li>`;
+        }
+        for (let i = start; i <= end; i++) {
+            const active = i === currentPage ? 'active' : '';
+            html += `<li class="${active}"><a href="#" data-page="${i}">${i}</a></li>`;
+        }
+        if (end < totalPages) {
+            if (end < totalPages - 1) html += `<li class="disabled"><span>...</span></li>`;
+            html += `<li><a href="#" data-page="${totalPages}">${totalPages}</a></li>`;
+        }
+        const nextDisabled = currentPage === totalPages ? 'disabled' : '';
+        html += `<li class="${nextDisabled}"><a href="#" data-page="${currentPage+1}">后页 <i class="fa fa-angle-right"></i></a></li>`;
+        html += '</ul>';
+        container.innerHTML = html;
+
+        container.querySelectorAll('a[data-page]').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const page = parseInt(link.dataset.page);
+                if (!isNaN(page) && page >= 1 && page <= totalPages && page !== currentPage) {
+                    callback(page);
+                }
+            });
+        });
+    }
+
+    // ========== 路由 ==========
+    async function loadPage(page) {
+        state.currentPage = page;
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll(`[data-page="${page}"]`).forEach(el => el.classList.add('active'));
+
+        const app = document.getElementById('app');
+        switch(page) {
+            case 'home': app.innerHTML = renderHome(); break;
+            case 'season': app.innerHTML = renderSeason(); await initSeason(); break;
+            case 'active': app.innerHTML = renderActive(); await initActive(); break;
+            case 'region': app.innerHTML = renderRegion(); await initRegion(); break;
+            case 'comprehensive': app.innerHTML = renderComprehensive(); await initComprehensive(); break;
+            default: window.location.hash = '#home';
+        }
+    }
+
+    // ========== 首页 ==========
+    function renderHome() {
+        return `
+            <div class="page-heading"><h2>首页</h2></div>
+            <div style="text-align: center; margin: 50px 0;">
+                <h3 style="font-size: 2.5rem; color: #4a6ee0;">探索未来，未来已来。</h3>
+            </div>
+            <div class="announcement">
+                <h3><i class="fab fa-tencent-weibo"></i> 公告</h3>
+                <div id="announcement-content">
+                    <p>网站上线试运行中… 欢迎反馈建议。</p>
+                    <p>排名数据更新至 2026-02-28。</p>
+                </div>
+                <a href="https://docs.qq.com/sheet/xxx" target="_blank" class="btn btn-primary">编辑公告</a>
+            </div>
+        `;
+    }
+
+    // ========== 赛季排名 ==========
+    function renderSeason() {
+        return `
+            <div class="page-heading">
+                <h2>赛季排名 <span class="tooltip-icon" id="season-tooltip" data-tooltip="本页面为赛季排名，以一年为一个赛季将参赛选手在当个赛季的最佳成绩进行排名；所有的排名成绩源自WCA赛事的官方排名。">?</span></h2>
+            </div>
+            <div class="filter-section">
+                <div class="filter-item">
+                    <label>范围</label>
+                    <select id="season-scope"></select>
+                </div>
+                <div class="filter-item">
+                    <label>项目</label>
+                    <select id="season-project">${projectOptions()}</select>
+                </div>
+                <div class="filter-item">
+                    <label>性别</label>
+                    <select id="season-gender">${genderOptions()}</select>
+                </div>
+                <div class="btn-group">
+                    <button id="season-single" class="btn btn-warning"><i class="fas fa-stopwatch"></i> 单次</button>
+                    <button id="season-average" class="btn btn-primary"><i class="fas fa-chart-line"></i> 平均</button>
+                </div>
+            </div>
+            <div class="current-info">
+                <h3><i class="fa fa-info-circle"></i> 当前浏览：<span id="season-current-project">三阶</span> - <span id="season-current-type">单次</span></h3>
+            </div>
+            <div class="table-container">
+                <table><thead><tr><th>排名</th><th>姓名</th><th>国家</th><th>成绩</th><th>比赛</th><th>WCA ID</th></tr></thead><tbody id="season-tbody"></tbody></table>
+            </div>
+            <div class="pagination-container" id="season-pagination"></div>
+        `;
+    }
+
+    async function initSeason() {
+        await loadMeta();
+        populateScopeSelect('season-scope', state.season.scope);
+        document.getElementById('season-project').value = state.season.project;
+        document.getElementById('season-gender').value = state.season.gender;
+        bindEvents('season', false);
+        document.getElementById('season-tooltip')?.addEventListener('click', showTooltip);
+        await loadPageData('season');
+    }
+
+    async function loadSeasonData() {
+        const { project, type, gender, continent, country } = state.season;
+        updateCurrentLabels('season', project, type);
+        try {
+            let data = await fetchJSON(`data/season/${type}/${project}.json`);
+            data = applyGenderFilter(data, gender);
+            data = applyScopeFilter(data, continent, country);
+            renderTable('season', data, false);
+        } catch (e) {
+            console.error(e);
+            document.getElementById('season-tbody').innerHTML = '<tr><td colspan="6">数据加载失败</td></tr>';
+        }
+    }
+
+    // ========== 现役排名 ==========
+    function renderActive() {
+        return `
+            <div class="page-heading">
+                <h2>现役排名 <span class="tooltip-icon" id="active-tooltip" data-tooltip="本页面为现役排名，以三年为期，将参赛选手在此期间的最佳成绩进行排名，超过三年无参赛记录的选手将不被列入排名；所有的排名成绩源自WCA赛事的官方排名。">?</span></h2>
+            </div>
+            <div class="filter-section">
+                <div class="filter-item">
+                    <label>范围</label>
+                    <select id="active-scope"></select>
+                </div>
+                <div class="filter-item">
+                    <label>项目</label>
+                    <select id="active-project">${projectOptions()}</select>
+                </div>
+                <div class="filter-item">
+                    <label>性别</label>
+                    <select id="active-gender">${genderOptions()}</select>
+                </div>
+                <div class="btn-group">
+                    <button id="active-single" class="btn btn-warning"><i class="fas fa-stopwatch"></i> 单次</button>
+                    <button id="active-average" class="btn btn-primary"><i class="fas fa-chart-line"></i> 平均</button>
+                </div>
+            </div>
+            <div class="current-info">
+                <h3><i class="fa fa-info-circle"></i> 当前浏览：<span id="active-current-project">三阶</span> - <span id="active-current-type">单次</span></h3>
+            </div>
+            <div class="table-container">
+                <table><thead><tr><th>排名</th><th>姓名</th><th>国家</th><th>成绩</th><th>比赛</th><th>WCA ID</th></tr></thead><tbody id="active-tbody"></tbody></table>
+            </div>
+            <div class="pagination-container" id="active-pagination"></div>
+        `;
+    }
+
+    async function initActive() {
+        await loadMeta();
+        populateScopeSelect('active-scope', state.active.scope);
+        document.getElementById('active-project').value = state.active.project;
+        document.getElementById('active-gender').value = state.active.gender;
+        bindEvents('active', false);
+        document.getElementById('active-tooltip')?.addEventListener('click', showTooltip);
+        await loadPageData('active');
+    }
+
+    async function loadActiveData() {
+        const { project, type, gender, continent, country } = state.active;
+        updateCurrentLabels('active', project, type);
+        try {
+            let data = await fetchJSON(`data/active/${type}/${project}.json`);
+            data = applyGenderFilter(data, gender);
+            data = applyScopeFilter(data, continent, country);
+            renderTable('active', data, false);
+        } catch (e) {
+            console.error(e);
+            document.getElementById('active-tbody').innerHTML = '<tr><td colspan="6">数据加载失败</td></tr>';
+        }
+    }
+
+    // ========== 省市排名 ==========
+    function renderRegion() {
+        return `
+            <div class="page-heading">
+                <h2>省市排名 <span class="tooltip-icon" id="region-tooltip" data-tooltip="本页面为省市排名，可以查看中国每个省市区域的选手排名，2018年5月下旬前没有在粗饼网选择归属地的选手将自动加入作者虚构的秘境——神手谷；所有的排名成绩源自WCA赛事的官方排名。">?</span></h2>
+            </div>
+            <div class="filter-section">
+                <div class="filter-item">
+                    <label>时期</label>
+                    <div class="radio-group" id="region-period-group">
+                        <label><input type="radio" name="region-period" value="historical" checked> 历史最好</label>
+                        <label><input type="radio" name="region-period" value="season"> 赛季</label>
+                        <label><input type="radio" name="region-period" value="active"> 现役</label>
+                    </div>
+                </div>
+                <div class="filter-item">
+                    <label>省份</label>
+                    <select id="region-province"></select>
+                </div>
+                <div class="filter-item">
+                    <label>城市</label>
+                    <select id="region-city"></select>
+                </div>
+                <div class="filter-item">
+                    <label>项目</label>
+                    <select id="region-project">${projectOptions()}</select>
+                </div>
+                <div class="filter-item">
+                    <label>性别</label>
+                    <select id="region-gender">${genderOptions()}</select>
+                </div>
+                <div class="btn-group">
+                    <button id="region-single" class="btn btn-warning"><i class="fas fa-stopwatch"></i> 单次</button>
+                    <button id="region-average" class="btn btn-primary"><i class="fas fa-chart-line"></i> 平均</button>
+                </div>
+            </div>
+            <div class="current-info">
+                <h3><i class="fa fa-info-circle"></i> 当前浏览：<span id="region-current-project">三阶</span> - <span id="region-current-type">单次</span> <span id="region-current-period">历史最好</span></h3>
+            </div>
+            <div class="table-container">
+                <table><thead><tr><th>排名</th><th>姓名</th><th>省份</th><th>城市</th><th>成绩</th><th>比赛</th><th>WCA ID</th></tr></thead><tbody id="region-tbody"></tbody></table>
+            </div>
+            <div class="pagination-container" id="region-pagination"></div>
+        `;
+    }
+
+    async function initRegion() {
+        await loadMeta();
+        const radios = document.querySelectorAll('input[name="region-period"]');
+        radios.forEach(r => {
+            if (r.value === state.region.period) r.checked = true;
+            r.addEventListener('change', (e) => {
+                state.region.period = e.target.value;
+            });
+        });
+
+        try {
+            const historicalData = await fetchJSON(`data/region/historical/single/333.json`);
+            const allRecords = historicalData;
+            const provinceSet = new Set();
+            const cityMap = {};
+            allRecords.forEach(r => {
+                if (r.province) {
+                    provinceSet.add(r.province);
+                    if (r.city) {
+                        if (!cityMap[r.province]) cityMap[r.province] = new Set();
+                        cityMap[r.province].add(r.city);
+                    }
+                }
+            });
+            state.region.allProvinces = Array.from(provinceSet).sort();
+            state.region.provinceCities = {};
+            for (let p in cityMap) {
+                state.region.provinceCities[p] = Array.from(cityMap[p]).sort();
+            }
+        } catch (e) {
+            console.warn('无法构建省份城市列表', e);
+            state.region.allProvinces = [];
+            state.region.provinceCities = {};
+        }
+
+        const provinceSelect = document.getElementById('region-province');
+        provinceSelect.innerHTML = state.region.allProvinces.map(p => `<option value="${p}">${p}</option>`).join('');
+        if (state.region.allProvinces.includes('北京')) {
+            provinceSelect.value = '北京';
+            state.region.province = '北京';
+        } else if (state.region.allProvinces.length > 0) {
+            provinceSelect.value = state.region.allProvinces[0];
+            state.region.province = state.region.allProvinces[0];
+        }
+
+        updateRegionCitySelect(state.region.province);
+
+        document.getElementById('region-project').value = state.region.project;
+        document.getElementById('region-gender').value = state.region.gender;
+        bindEvents('region', false);
+        document.getElementById('region-tooltip')?.addEventListener('click', showTooltip);
+
+        provinceSelect.addEventListener('change', (e) => {
+            state.region.province = e.target.value;
+            updateRegionCitySelect(state.region.province);
+        });
+
+        document.getElementById('region-city').addEventListener('change', (e) => {
+            state.region.city = e.target.value;
+        });
+
+        document.getElementById('region-single').addEventListener('click', () => {
+            setType('region', 'single');
+            loadRegionData();
+        });
+        document.getElementById('region-average').addEventListener('click', () => {
+            setType('region', 'average');
+            loadRegionData();
+        });
+
+        await loadRegionData();
+    }
+
+    function updateRegionCitySelect(province) {
+        const citySelect = document.getElementById('region-city');
+        if (MUNICIPALITIES.includes(province)) {
+            citySelect.disabled = true;
+            citySelect.innerHTML = `<option value="${province}">${province}</option>`;
+            citySelect.value = province;
+            state.region.city = province;
+        } else {
+            citySelect.disabled = false;
+            const cities = state.region.provinceCities[province] || [];
+            let options = '<option value="全部城市">全部城市</option>';
+            cities.forEach(c => {
+                options += `<option value="${c}">${c}</option>`;
+            });
+            citySelect.innerHTML = options;
+            citySelect.value = '全部城市';
+            state.region.city = '全部城市';
+        }
+    }
+
+    async function loadRegionData() {
+        const { period, project, type, gender, province, city } = state.region;
+        document.getElementById('region-current-project').textContent = getProjectName(project);
+        document.getElementById('region-current-type').textContent = type === 'single' ? '单次' : '平均';
+        document.getElementById('region-current-period').textContent = 
+            period === 'historical' ? '历史最好' : (period === 'season' ? '赛季' : '现役');
+
+        try {
+            let data = await fetchJSON(`data/region/${period}/${type}/${project}.json`);
+            data = applyGenderFilter(data, gender);
+            if (province) {
+                data = data.filter(d => d.province === province);
+            }
+            if (city === '全部城市') {
+                // 不做城市筛选
+            } else if (city) {
+                data = data.filter(d => d.city === city);
+            }
+            renderTable('region', data, true);
+        } catch (e) {
+            console.error(e);
+            document.getElementById('region-tbody').innerHTML = '<tr><td colspan="7">数据加载失败</td></tr>';
+        }
+    }
+
+    // ========== 综合排名 ==========
+    function renderComprehensive() {
+        return `
+            <div class="page-heading">
+                <h2>综合排名 <span class="tooltip-icon" id="comp-tooltip" data-tooltip="根据所选数据源和项目，计算选手在多个项目中的排名总和，并自动生成综合排名（缺失项目采用该项目的最大排名+1作为惩罚）。">?</span></h2>
+            </div>
+            <div class="filter-section" id="comp-filters">
+                <div class="filter-item">
+                    <label>数据源</label>
+                    <select id="comp-source">
+                        <option value="season">赛季排名</option>
+                        <option value="active">现役排名</option>
+                        <option value="province">省市排名</option>
+                    </select>
+                </div>
+                <div class="filter-item" id="comp-scope-item">
+                    <label>范围</label>
+                    <select id="comp-scope"></select>
+                </div>
+                <div class="filter-item hidden" id="comp-dataset-item">
+                    <label>数据类型</label>
+                    <select id="comp-dataset">
+                        <option value="historical">历史最好</option>
+                        <option value="season">赛季 (2026)</option>
+                        <option value="active">现役 (2024-2026)</option>
+                    </select>
+                </div>
+                <div class="filter-item hidden" id="comp-province-item">
+                    <label>省份</label>
+                    <select id="comp-province">
+                        <option value="全部省份">全部省份</option>
+                    </select>
+                </div>
+                <div class="filter-item hidden" id="comp-city-item">
+                    <label>城市</label>
+                    <select id="comp-city">
+                        <option value="全部城市">全部城市</option>
+                    </select>
+                </div>
+                <div class="filter-item" style="flex: 2;">
+                    <label>项目（可多选）</label>
+                    <div class="checkbox-group" id="comp-project-group">
+                        ${projectCheckboxes()}
+                    </div>
+                </div>
+                <div class="filter-item">
+                    <label>性别</label>
+                    <select id="comp-gender">${genderOptions()}</select>
+                </div>
+                <div class="btn-group">
+                    <button id="comp-single" class="btn btn-warning"><i class="fas fa-stopwatch"></i> 单次</button>
+                    <button id="comp-average" class="btn btn-primary"><i class="fas fa-chart-line"></i> 平均</button>
+                </div>
+            </div>
+            <div class="current-info">
+                <h3><i class="fa fa-info-circle"></i> 当前浏览：<span id="comp-current">赛季排名 - 已选1个项目 (单次)</span></h3>
+            </div>
+            <div class="table-container">
+                <table><thead><tr><th>综合排名</th><th>姓名</th><th>区域</th><th>城市</th><th>总排名和</th><th>参与项目数</th></tr></thead><tbody id="comp-tbody"></tbody></table>
+            </div>
+            <div class="pagination-container" id="comp-pagination"></div>
+        `;
+    }
+
+    function projectCheckboxes() {
+        return PROJECT_LIST.map(p => 
+            `<label><input type="checkbox" value="${p.code}" ${state.comprehensive.selectedEvents.includes(p.code) ? 'checked' : ''}> ${p.name}</label>`
+        ).join('');
+    }
+
+    async function initComprehensive() {
+        await loadMeta();
+        populateScopeSelect('comp-scope', state.comprehensive.scope);
+
+        const sourceSelect = document.getElementById('comp-source');
+        sourceSelect.value = state.comprehensive.source;
+        toggleCompFilters(state.comprehensive.source);
+
+        const projectGroup = document.getElementById('comp-project-group');
+        projectGroup.innerHTML = projectCheckboxes();
+        projectGroup.addEventListener('change', () => {
+            const checkboxes = projectGroup.querySelectorAll('input[type=checkbox]');
+            const selected = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
+            state.comprehensive.selectedEvents = selected.length ? selected : ['333'];
+            calculateComprehensive();
+        });
+
+        sourceSelect.addEventListener('change', (e) => {
+            state.comprehensive.source = e.target.value;
+            toggleCompFilters(e.target.value);
+            calculateComprehensive();
+        });
+
+        document.getElementById('comp-scope').addEventListener('change', (e) => {
+            state.comprehensive.scope = e.target.value;
+            calculateComprehensive();
+        });
+
+        document.getElementById('comp-dataset').addEventListener('change', (e) => {
+            state.comprehensive.subDataset = e.target.value;
+            calculateComprehensive();
+        });
+
+        document.getElementById('comp-province').addEventListener('change', async (e) => {
+            state.comprehensive.province = e.target.value;
+            await updateCompCitySelect(state.comprehensive.province);
+            calculateComprehensive();
+        });
+
+        document.getElementById('comp-city').addEventListener('change', (e) => {
+            state.comprehensive.city = e.target.value;
+            calculateComprehensive();
+        });
+
+        document.getElementById('comp-gender').addEventListener('change', (e) => {
+            state.comprehensive.gender = e.target.value;
+            calculateComprehensive();
+        });
+
+        document.getElementById('comp-single').addEventListener('click', () => {
+            setType('comprehensive', 'single');
+            calculateComprehensive();
+        });
+        document.getElementById('comp-average').addEventListener('click', () => {
+            setType('comprehensive', 'average');
+            calculateComprehensive();
+        });
+
+        document.getElementById('comp-tooltip')?.addEventListener('click', showTooltip);
+
+        await calculateComprehensive();
+    }
+
+    function toggleCompFilters(source) {
+        const isProvince = source === 'province';
+        document.getElementById('comp-scope-item').classList.toggle('hidden', isProvince);
+        document.getElementById('comp-dataset-item').classList.toggle('hidden', !isProvince);
+        document.getElementById('comp-province-item').classList.toggle('hidden', !isProvince);
+        document.getElementById('comp-city-item').classList.toggle('hidden', !isProvince);
+        if (isProvince) {
+            loadCompProvinceList();
+        }
+    }
+
+    async function loadCompProvinceList() {
+        try {
+            const data = await fetchJSON(`data/region/historical/single/333.json`);
+            const provinces = [...new Set(data.map(d => d.province).filter(p => p))].sort();
+            const provinceSelect = document.getElementById('comp-province');
+            provinceSelect.innerHTML = '<option value="全部省份">全部省份</option>' + 
+                provinces.map(p => `<option value="${p}">${p}</option>`).join('');
+            provinceSelect.value = '全部省份';
+            state.comprehensive.province = '全部省份';
+            await updateCompCitySelect('全部省份');
+        } catch (e) {
+            console.warn('加载省份列表失败', e);
+        }
+    }
+
+    async function updateCompCitySelect(province) {
+        const citySelect = document.getElementById('comp-city');
+        if (province === '全部省份') {
+            citySelect.disabled = true;
+            citySelect.innerHTML = '<option value="全部城市">全部城市</option>';
+            citySelect.value = '全部城市';
+            state.comprehensive.city = '全部城市';
+            return;
+        }
+        if (MUNICIPALITIES.includes(province)) {
+            citySelect.disabled = true;
+            citySelect.innerHTML = `<option value="${province}">${province}</option>`;
+            citySelect.value = province;
+            state.comprehensive.city = province;
+            return;
+        }
+        try {
+            const data = await fetchJSON(`data/region/historical/single/333.json`);
+            const cities = [...new Set(data.filter(d => d.province === province).map(d => d.city).filter(c => c))].sort();
+            citySelect.disabled = false;
+            citySelect.innerHTML = '<option value="全部城市">全部城市</option>' + 
+                cities.map(c => `<option value="${c}">${c}</option>`).join('');
+            citySelect.value = '全部城市';
+            state.comprehensive.city = '全部城市';
+        } catch (e) {
+            console.warn('加载城市列表失败', e);
+        }
+    }
+
+    async function calculateComprehensive() {
+        const { source, subDataset, scope, selectedEvents, gender, province, city, type } = state.comprehensive;
+        if (selectedEvents.length === 0) {
+            document.getElementById('comp-tbody').innerHTML = '<tr><td colspan="6">请至少选择一个项目</td></tr>';
+            return;
+        }
+
+        const sourceName = source === 'season' ? '赛季' : (source === 'active' ? '现役' : '省市');
+        document.getElementById('comp-current').innerText = `${sourceName} - 已选${selectedEvents.length}个项目 (${type==='single'?'单次':'平均'})`;
+
+        const projectDataMap = {}; // 项目代码 -> { rankMap: { wcaid: rank }, maxRank: 该项目的最大排名（即人数） }
+        const personInfoMap = new Map();
+
+        for (let proj of selectedEvents) {
+            try {
+                let basePath;
+                if (source === 'season') basePath = `data/season/${type}`;
+                else if (source === 'active') basePath = `data/active/${type}`;
+                else basePath = `data/region/${subDataset}/${type}`;
+
+                const url = `${basePath}/${proj}.json`;
+                let data = await fetchJSON(url);
+
+                if (gender !== 'all') {
+                    data = data.filter(d => d.gender === gender);
+                }
+
+                if (source !== 'province') {
+                    const [scopeType, scopeValue] = scope.split(':');
+                    if (scopeType === 'continent') {
+                        data = data.filter(d => CONTINENT_MAP[d.country] === scopeValue);
+                    } else if (scopeType === 'country') {
+                        data = data.filter(d => d.country === scopeValue);
+                    }
+                } else {
+                    if (province !== '全部省份') {
+                        data = data.filter(d => d.province === province);
+                    }
+                    if (city === '全部城市') {
+                        // 不筛选城市
+                    } else if (city) {
+                        data = data.filter(d => d.city === city);
+                    }
+                }
+
+                data.forEach(d => {
+                    const id = d.wcaid;
+                    if (!personInfoMap.has(id)) {
+                        personInfoMap.set(id, {
+                            name: d.name,
+                            country: d.country || '中国',
+                            province: d.province || '',
+                            city: d.city || ''
+                        });
+                    }
+                });
+
+                const scoreKey = type === 'single' ? '单次成绩(百分之一秒)' : '平均成绩(百分之一秒)';
+                const ranked = recomputeRanks(data, scoreKey);
+                const rankMap = {};
+                ranked.forEach(item => {
+                    rankMap[item.wcaid] = item.rank;
+                });
+                projectDataMap[proj] = {
+                    rankMap: rankMap,
+                    maxRank: data.length
+                };
+            } catch (e) {
+                console.warn(`加载项目 ${proj} 失败`, e);
+                projectDataMap[proj] = {
+                    rankMap: {},
+                    maxRank: 0
+                };
+            }
+        }
+
+        const results = [];
+        for (let [wcaid, info] of personInfoMap.entries()) {
+            let totalRank = 0;
+            let count = 0;
+            for (let proj of selectedEvents) {
+                const projData = projectDataMap[proj];
+                if (projData.rankMap[wcaid]) {
+                    totalRank += projData.rankMap[wcaid];
+                    count++;
+                } else {
+                    totalRank += (projData.maxRank + 1);
+                }
+            }
+            if (count > 0) {
+                results.push({
+                    wcaid: wcaid,
+                    name: info.name,
+                    region: source !== 'province' ? info.country : (info.province || ''),
+                    city: source !== 'province' ? '' : info.city,
+                    totalRank: totalRank,
+                    eventCount: count
+                });
+            }
+        }
+
+        results.sort((a, b) => a.totalRank - b.totalRank);
+
+        let rank = 1, lastTotal = null, sameCount = 0;
+        const rankedResults = results.map((item, idx) => {
+            if (idx === 0) {
+                lastTotal = item.totalRank;
+                return { ...item, displayRank: rank };
+            }
+            if (item.totalRank === lastTotal) {
+                sameCount++;
+                return { ...item, displayRank: rank };
+            } else {
+                rank += 1 + sameCount;
+                sameCount = 0;
+                lastTotal = item.totalRank;
+                return { ...item, displayRank: rank };
+            }
+        });
+
+        renderComprehensiveTable(rankedResults);
+    }
+
+    function renderComprehensiveTable(data) {
+        const tbody = document.getElementById('comp-tbody');
+        if (data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6">暂无数据</td></tr>';
+            return;
+        }
+
+        state.pagination.data = data;
+        state.pagination.totalPages = Math.ceil(data.length / 100);
+        state.pagination.currentPage = 1;
+
+        const pageData = paginate(data, 1);
+        renderCompTableBody(tbody, pageData);
+
+        renderPagination('comp-pagination', state.pagination.totalPages, 1, (newPage) => {
+            state.pagination.currentPage = newPage;
+            const newPageData = paginate(data, newPage);
+            renderCompTableBody(tbody, newPageData);
+        });
+    }
+
+    function renderCompTableBody(tbody, data) {
+        tbody.innerHTML = data.map(item => `
+            <tr>
+                <td class="rank-cell">${item.displayRank}</td>
+                <td>${item.name}</td>
+                <td>${item.region || ''}</td>
+                <td>${item.city || ''}</td>
+                <td>${item.totalRank}</td>
+                <td>${item.eventCount}</td>
+            </tr>
+        `).join('');
+    }
+
+    // ========== 通用辅助函数 ==========
+    function projectOptions() {
+        return PROJECT_LIST.map(p => `<option value="${p.code}">${p.name}</option>`).join('');
+    }
+
+    function genderOptions() {
+        return `<option value="all">所有</option><option value="男">男</option><option value="女">女</option><option value="未知">未知</option>`;
+    }
+
+    function getProjectName(code) {
+        const p = PROJECT_LIST.find(p => p.code === code);
+        return p ? p.name : code;
+    }
+
+    async function loadMeta() {
+        if (state.meta) return;
+        try {
+            state.meta = await fetchJSON('data/meta.json');
+        } catch {
+            state.meta = { countries: [], country_continent: {} };
+        }
+    }
+
+    function populateScopeSelect(selectId, currentVal) {
+        const select = document.getElementById(selectId);
+        if (!select) return;
+        let html = '<option value="world">世界</option>';
+        const continents = ['亚洲','欧洲','北美洲','南美洲','非洲','大洋洲'];
+        continents.forEach(c => html += `<option value="continent:${c}">${c}</option>`);
+        html += '<option value="country:China">中国</option>';
+        if (state.meta && state.meta.countries) {
+            state.meta.countries.filter(c => c !== 'China').forEach(c => html += `<option value="country:${c}">${c}</option>`);
+        }
+        select.innerHTML = html;
+        if (currentVal) select.value = currentVal;
+    }
+
+    function bindEvents(page, autoLoad = true) {
+        const prefix = page === 'comprehensive' ? 'comp' : page;
+        if (page !== 'comprehensive') {
+            document.getElementById(`${prefix}-project`).addEventListener('change', (e) => {
+                state[page].project = e.target.value;
+            });
+        }
+        document.getElementById(`${prefix}-gender`).addEventListener('change', (e) => {
+            state[page].gender = e.target.value;
+        });
+        if (prefix !== 'region' && page !== 'comprehensive') {
+            document.getElementById(`${prefix}-scope`).addEventListener('change', (e) => {
+                const val = e.target.value;
+                if (val.startsWith('continent:')) {
+                    state[page].continent = val.split(':')[1];
+                    state[page].country = '';
+                } else if (val.startsWith('country:')) {
+                    state[page].country = val.split(':')[1];
+                    state[page].continent = '';
+                } else {
+                    state[page].continent = '';
+                    state[page].country = '';
+                }
+            });
+        }
+        if (page !== 'comprehensive') {
+            document.getElementById(`${prefix}-single`).addEventListener('click', () => {
+                setType(page, 'single');
+                loadPageData(page);
+            });
+            document.getElementById(`${prefix}-average`).addEventListener('click', () => {
+                setType(page, 'average');
+                loadPageData(page);
+            });
+        }
+    }
+
+    function setType(page, type) {
+        state[page].type = type;
+        const prefix = page === 'comprehensive' ? 'comp' : page;
+        const singleBtn = document.getElementById(`${prefix}-single`);
+        const avgBtn = document.getElementById(`${prefix}-average`);
+        if (type === 'single') {
+            singleBtn.classList.add('btn-warning'); singleBtn.classList.remove('btn-primary');
+            avgBtn.classList.add('btn-primary'); avgBtn.classList.remove('btn-warning');
+        } else {
+            avgBtn.classList.add('btn-warning'); avgBtn.classList.remove('btn-primary');
+            singleBtn.classList.add('btn-primary'); singleBtn.classList.remove('btn-warning');
+        }
+    }
+
+    function loadPageData(page) {
+        if (page === 'season') loadSeasonData();
+        else if (page === 'active') loadActiveData();
+        else if (page === 'region') loadRegionData();
+        else if (page === 'comprehensive') calculateComprehensive();
+    }
+
+    function updateCurrentLabels(page, project, type) {
+        document.getElementById(`${page}-current-project`).textContent = getProjectName(project);
+        document.getElementById(`${page}-current-type`).textContent = type === 'single' ? '单次' : '平均';
+    }
+
+    function applyGenderFilter(data, gender) {
+        if (gender === 'all') return data;
+        return data.filter(d => d.gender === gender);
+    }
+
+    function applyScopeFilter(data, continent, country) {
+        if (continent) {
+            return data.filter(d => CONTINENT_MAP[d.country] === continent);
+        } else if (country) {
+            return data.filter(d => d.country === country);
+        }
+        return data;
+    }
+
+    function renderTable(page, data, regionMode = false) {
+        const scoreKey = state[page].type === 'single' ? '单次成绩(百分之一秒)' : '平均成绩(百分之一秒)';
+        const ranked = recomputeRanks(data, scoreKey);
+        state.pagination.data = ranked;
+        state.pagination.totalPages = Math.ceil(ranked.length / 100);
+        state.pagination.currentPage = 1;
+
+        const tbody = document.getElementById(`${page}-tbody`);
+        const pageData = paginate(ranked, 1);
+        renderTableBody(tbody, pageData, regionMode);
+
+        renderPagination(`${page}-pagination`, state.pagination.totalPages, 1, (newPage) => {
+            state.pagination.currentPage = newPage;
+            const newPageData = paginate(ranked, newPage);
+            renderTableBody(tbody, newPageData, regionMode);
+        });
+    }
+
+    function renderTableBody(tbody, data, regionMode) {
+        if (regionMode) {
+            tbody.innerHTML = data.map(item => `
+                <tr>
+                    <td class="rank-cell">${item.displayRank || item.rank}</td>
+                    <td>${item.name}</td>
+                    <td>${item.province || ''}</td>
+                    <td>${item.city || ''}</td>
+                    <td>${formatResult(item.result)}</td>
+                    <td>${item.competition || ''}</td>
+                    <td>${item.wcaid}</td>
+                </tr>
+            `).join('');
+        } else {
+            tbody.innerHTML = data.map(item => `
+                <tr>
+                    <td class="rank-cell">${item.displayRank || item.rank}</td>
+                    <td>${item.name}</td>
+                    <td>${item.country}</td>
+                    <td>${formatResult(item.result)}</td>
+                    <td>${item.competition || ''}</td>
+                    <td>${item.wcaid}</td>
+                </tr>
+            `).join('');
+        }
+    }
+
+    function showTooltip(e) {
+        e.preventDefault();
+        const icon = e.currentTarget;
+        icon.classList.add('active');
+        if (state.tooltipTimer) clearTimeout(state.tooltipTimer);
+        state.tooltipTimer = setTimeout(() => {
+            icon.classList.remove('active');
+        }, 6000);
+    }
+
+    // ========== 启动 ==========
+    window.addEventListener('load', async () => {
+        const menuIcon = document.getElementById('mobile-menu-icon');
+        const mobileNav = document.getElementById('mobile-nav');
+        menuIcon.addEventListener('click', () => mobileNav.classList.toggle('show'));
+        mobileNav.innerHTML = `
+            <a href="#home" class="nav-item">首页</a>
+            <a href="#season" class="nav-item">赛季排名</a>
+            <a href="#active" class="nav-item">现役排名</a>
+            <a href="#region" class="nav-item">省市排名</a>
+            <a href="#comprehensive" class="nav-item">综合排名</a>
+        `;
+        mobileNav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => mobileNav.classList.remove('show')));
+
+        function handleHash() {
+            const hash = window.location.hash.slice(1) || 'home';
+            loadPage(hash);
+        }
+        window.addEventListener('hashchange', handleHash);
+        handleHash();
+    });
+</script>
+</body>
+</html>
