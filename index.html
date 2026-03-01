@@ -606,6 +606,7 @@
         return data.slice(start, start + pageSize);
     }
 
+    // 改进的分页渲染函数，支持动态更新当前页
     function renderPagination(containerId, totalPages, currentPage, callback) {
         const container = document.getElementById(containerId);
         if (!container) return;
@@ -1423,11 +1424,16 @@
         const pageData = paginate(data, 1);
         renderCompTableBody(tbody, pageData);
 
-        renderPagination('comp-pagination', state.pagination.totalPages, 1, (newPage) => {
+        // 定义翻页回调
+        const onPageChange = (newPage) => {
             state.pagination.currentPage = newPage;
             const newPageData = paginate(data, newPage);
             renderCompTableBody(tbody, newPageData);
-        });
+            // 重新渲染分页组件，并传入当前的回调函数（递归调用）
+            renderPagination('comp-pagination', state.pagination.totalPages, newPage, onPageChange);
+        };
+
+        renderPagination('comp-pagination', state.pagination.totalPages, 1, onPageChange);
     }
 
     function renderCompTableBody(tbody, data) {
@@ -1607,11 +1613,16 @@
         const pageData = paginate(ranked, 1);
         renderTableBody(tbody, pageData, page === 'region');
 
-        renderPagination(`${page}-pagination`, state.pagination.totalPages, 1, (newPage) => {
+        // 定义翻页回调
+        const onPageChange = (newPage) => {
             state.pagination.currentPage = newPage;
             const newPageData = paginate(ranked, newPage);
             renderTableBody(tbody, newPageData, page === 'region');
-        });
+            // 重新渲染分页组件，并传入当前的回调函数
+            renderPagination(`${page}-pagination`, state.pagination.totalPages, newPage, onPageChange);
+        };
+
+        renderPagination(`${page}-pagination`, state.pagination.totalPages, 1, onPageChange);
     }
 
     function renderTableBody(tbody, data, regionMode) {
