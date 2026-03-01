@@ -1389,7 +1389,7 @@
 
     // 辅助函数：根据国家名获取所属大洲（从meta中读取）
     function applyContinentFilter(country, continent) {
-        const countryContinent = state.meta?.countryContinent || {};
+        const countryContinent = state.meta?.country_continent || {};
         return countryContinent[country] === continent;
     }
 
@@ -1464,15 +1464,15 @@
         if (state.meta) return;
         try {
             state.meta = await fetchJSON('data/meta.json');
-            // 确保 countryContinent 存在
-            if (!state.meta.countryContinent) {
-                state.meta.countryContinent = {};
-                console.warn('meta.json 缺少 countryContinent 字段，将使用空映射，按洲筛选将无法工作');
+            // 确保 country_continent 存在（使用下划线命名）
+            if (!state.meta.country_continent) {
+                state.meta.country_continent = {};
+                console.warn('meta.json 缺少 country_continent 字段，将使用空映射，按洲筛选将无法工作');
             }
         } catch {
             state.meta = { 
                 countries: [], 
-                countryContinent: {} 
+                country_continent: {} 
             };
         }
     }
@@ -1582,7 +1582,7 @@
 
     function applyScopeFilter(data, continent, country) {
         if (continent) {
-            const countryContinent = state.meta?.countryContinent || {};
+            const countryContinent = state.meta?.country_continent || {};
             return data.filter(d => countryContinent[d.country] === continent);
         } else if (country) {
             return data.filter(d => d.country === country);
