@@ -402,6 +402,27 @@
         }
         .footer a { color: #4a6ee0; text-decoration: none; }
         .hidden { display: none !important; }
+
+        /* 加载动画样式 */
+        .loading-cell {
+            text-align: center;
+            padding: 40px 0;
+            font-size: 1.1rem;
+            color: #6c757d;
+        }
+        .loading-dots::after {
+            content: '...';
+            display: inline-block;
+            animation: loading-dots 1.5s steps(4, end) infinite;
+            width: 1.5em;
+            text-align: left;
+        }
+        @keyframes loading-dots {
+            0%, 20% { content: ''; }
+            40% { content: '.'; }
+            60% { content: '..'; }
+            80%, 100% { content: '...'; }
+        }
     </style>
 </head>
 <body>
@@ -508,6 +529,24 @@
             console.log(`加载成功: ${url} (对象)`);
         }
         return data;
+    }
+
+    // 显示加载动画
+    function showPageLoading(page) {
+        const tbody = document.getElementById(`${page}-tbody`);
+        if (!tbody) return;
+        let colspan = 6; // 默认
+        if (page === 'region') {
+            // 省市排名：根据时期决定是否有比赛列
+            colspan = state.region.period === 'historical' ? 6 : 7;
+        } else if (page === 'season' || page === 'active') {
+            colspan = 6;
+        } else if (page === 'comprehensive') {
+            // 综合排名列数动态
+            const source = state.comprehensive.source;
+            colspan = source === 'province' ? 6 : 5;
+        }
+        tbody.innerHTML = `<tr><td colspan="${colspan}" class="loading-cell">加载中<span class="loading-dots"></span></td></tr>`;
     }
 
     function formatResultForSort(resultStr) {
@@ -697,6 +736,7 @@
 
     async function loadSeasonData() {
         if (state.currentPage !== 'season') return;
+        showPageLoading('season');
         const { project, type, gender, continent, country } = state.season;
         updateCurrentLabels('season', project, type);
         try {
@@ -762,6 +802,7 @@
 
     async function loadActiveData() {
         if (state.currentPage !== 'active') return;
+        showPageLoading('active');
         const { project, type, gender, continent, country } = state.active;
         updateCurrentLabels('active', project, type);
         try {
@@ -936,6 +977,7 @@
 
     async function loadRegionData() {
         if (state.currentPage !== 'region') return;
+        showPageLoading('region');
         const { period, project, type, gender, province, city } = state.region;
         document.getElementById('region-current-project').textContent = getProjectName(project);
         document.getElementById('region-current-type').textContent = type === 'single' ? '单次' : '平均';
@@ -1202,6 +1244,7 @@
 
     async function calculateComprehensive() {
         if (state.currentPage !== 'comprehensive') return;
+        showPageLoading('comprehensive');
         updateCompCurrentLabel(); // 更新标签
 
         const { source, subDataset, scope, selectedEvents, gender, province, city, type } = state.comprehensive;
