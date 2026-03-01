@@ -403,12 +403,16 @@
         .footer a { color: #4a6ee0; text-decoration: none; }
         .hidden { display: none !important; }
 
-        /* 加载动画样式 */
+        /* 加载动画样式 - 增强版 */
         .loading-cell {
             text-align: center;
             padding: 40px 0;
             font-size: 1.1rem;
             color: #6c757d;
+        }
+        .loading-cell i {
+            margin-right: 8px;
+            animation: spin 1s linear infinite;
         }
         .loading-dots::after {
             content: '...';
@@ -416,6 +420,10 @@
             animation: loading-dots 1.5s steps(4, end) infinite;
             width: 1.5em;
             text-align: left;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         @keyframes loading-dots {
             0%, 20% { content: ''; }
@@ -531,7 +539,7 @@
         return data;
     }
 
-    // 显示加载动画
+    // 显示加载动画（增强版带旋转图标）
     function showPageLoading(page) {
         const tbody = document.getElementById(`${page}-tbody`);
         if (!tbody) return;
@@ -542,11 +550,11 @@
         } else if (page === 'season' || page === 'active') {
             colspan = 6;
         } else if (page === 'comprehensive') {
-            // 综合排名列数动态，用一个大数确保覆盖
+            // 综合排名列数动态计算
             const source = state.comprehensive.source;
             colspan = source === 'province' ? 6 : 5;
         }
-        tbody.innerHTML = `<tr><td colspan="${colspan}" class="loading-cell">加载中<span class="loading-dots"></span></td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="${colspan}" class="loading-cell"><i class="fas fa-spinner"></i> 加载中<span class="loading-dots"></span></td></tr>`;
     }
 
     function formatResultForSort(resultStr) {
@@ -1245,9 +1253,10 @@
     async function calculateComprehensive() {
         if (state.currentPage !== 'comprehensive') return;
         
+        const startTime = Date.now();
         // 显示加载动画
         showPageLoading('comprehensive');
-        // 强制浏览器渲染动画
+        // 强制浏览器渲染
         await new Promise(resolve => setTimeout(resolve, 0));
         
         updateCompCurrentLabel(); // 更新标签
@@ -1377,6 +1386,13 @@
                 return { ...item, displayRank: rank };
             }
         });
+
+        // 确保动画至少显示500ms
+        const elapsed = Date.now() - startTime;
+        const minDisplayTime = 500;
+        if (elapsed < minDisplayTime) {
+            await new Promise(resolve => setTimeout(resolve, minDisplayTime - elapsed));
+        }
 
         renderComprehensiveTable(rankedResults);
     }
