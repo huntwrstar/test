@@ -204,10 +204,10 @@
             font-weight: normal;
             text-transform: none;
             color: #333;
-            width: calc(25% - 16px);  /* 每行4个 */
+            width: calc(25% - 16px);
             min-width: 100px;
         }
-        /* 项目标签样式 */
+        /* 项目标签样式 - 电脑端每行8个 */
         .project-tag-group {
             display: flex;
             flex-wrap: wrap;
@@ -216,15 +216,19 @@
         }
         .project-tag {
             display: inline-block;
-            padding: 6px 14px;
+            padding: 6px 8px;
             border: 1px solid #ced4da;
             border-radius: 30px;
             background-color: #f8f9fa;
             color: #495057;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             cursor: pointer;
             user-select: none;
             transition: all 0.2s;
+            text-align: center;
+            flex: 0 0 auto;
+            width: calc(12.5% - 7px); /* 每行8个，减去gap */
+            min-width: 70px;
         }
         .project-tag:hover {
             background-color: #e9ecef;
@@ -234,6 +238,14 @@
             background-color: #4a6ee0;
             border-color: #4a6ee0;
             color: white;
+        }
+        /* 手机端适配：每行3个 */
+        @media (max-width: 768px) {
+            .project-tag {
+                width: calc(33.33% - 6px);
+                font-size: 0.85rem;
+                padding: 5px 4px;
+            }
         }
         .radio-group {
             display: flex;
@@ -439,7 +451,7 @@
             scope: 'country:China',            // 范围（用于非省市）
             selectedEvents: ['333'],            // 选中的项目
             gender: 'all',
-            province: '全部省份',
+            province: '',                       // 默认省份，会在加载列表后设置第一个
             city: '全部城市',
             type: 'single',                     // single / average
             rankedData: [],
@@ -487,7 +499,6 @@
             } else {
                 console.warn(`警告: ${url} 返回空数组`);
             }
-            // 确保每条数据都有 result 字段（以防万一）
             data.forEach(item => {
                 if (item.result === undefined || item.result === null) {
                     item.result = 'DNF';
@@ -513,14 +524,11 @@
         return formatResultForSort(timeStr);
     }
 
-    // 修正后的成绩格式化函数
     function formatResult(resultStr) {
         if (!resultStr || resultStr === 'DNF' || resultStr === '暂无') return '暂无';
-        // 如果已经是可读格式（包含 : 或 . 且不是纯数字），直接返回
         if (typeof resultStr === 'string' && (resultStr.includes(':') || resultStr.includes('.')) && !/^\d+$/.test(resultStr)) {
             return resultStr;
         }
-        // 否则尝试转换为数字（百分之一秒）
         const num = parseFloat(resultStr);
         if (isNaN(num) || num <= 0) return '暂无';
         const totalSeconds = num / 100;
@@ -960,6 +968,11 @@
             <div class="page-heading">
                 <h2>综合排名 <span class="tooltip-icon" id="comp-tooltip" data-tooltip="根据所选数据源和项目，计算选手在多个项目中的排名总和，并自动生成综合排名（缺失项目采用该项目的最大排名+1作为惩罚）。">?</span></h2>
             </div>
+            <!-- 项目标签独立于筛选区，放在上方 -->
+            <div style="margin-bottom: 15px;">
+                <label style="font-size: 0.85rem; font-weight: 600; text-transform: uppercase; color: #6c757d; margin-bottom: 5px; display: block;">项目（点击选择）</label>
+                <div class="project-tag-group" id="comp-project-tags"></div>
+            </div>
             <div class="filter-section" id="comp-filters">
                 <div class="filter-item">
                     <label>数据源</label>
@@ -981,25 +994,17 @@
                         <option value="active">现役 (2024-2026)</option>
                     </select>
                 </div>
-                <div class="filter-item" style="flex: 2;">
-                    <label>项目（点击选择）</label>
-                    <div class="project-tag-group" id="comp-project-tags"></div>
-                </div>
                 <div class="filter-item">
                     <label>性别</label>
                     <select id="comp-gender">${genderOptions()}</select>
                 </div>
                 <div class="filter-item hidden" id="comp-province-item">
                     <label>省份</label>
-                    <select id="comp-province">
-                        <option value="全部省份">全部省份</option>
-                    </select>
+                    <select id="comp-province"></select>
                 </div>
                 <div class="filter-item hidden" id="comp-city-item">
                     <label>城市</label>
-                    <select id="comp-city">
-                        <option value="全部城市">全部城市</option>
-                    </select>
+                    <select id="comp-city"></select>
                 </div>
                 <div class="btn-group">
                     <button id="comp-single" class="btn btn-warning"><i class="fas fa-stopwatch"></i> 单次</button>
@@ -1131,12 +1136,15 @@
             const provinces = [...new Set(data.map(d => d.province).filter(p => p))].sort();
             const provinceSelect = document.getElementById('comp-province');
             if (provinceSelect) {
-                provinceSelect.innerHTML = '<option value="全部省份">全部省份</option>' + 
-                    provinces.map(p => `<option value="${p}">${p}</option>`).join('');
-                provinceSelect.value = '全部省份';
-                state.comprehensive.province = '全部省份';
+                // 去掉“全部省份”选项，直接填充省份
+                provinceSelect.innerHTML = provinces.map(p => `<option value="${p}">${p}</option>`).join('');
+                // 默认选中第一个
+                if (provinces.length > 0) {
+                    provinceSelect.value = provinces[0];
+                    state.comprehensive.province = provinces[0];
+                }
             }
-            await updateCompCitySelect('全部省份');
+            await updateCompCitySelect(state.comprehensive.province || provinces[0]);
         } catch (e) {
             console.warn('加载省份列表失败', e);
         }
@@ -1145,13 +1153,7 @@
     async function updateCompCitySelect(province) {
         const citySelect = document.getElementById('comp-city');
         if (!citySelect) return;
-        if (province === '全部省份') {
-            citySelect.disabled = true;
-            citySelect.innerHTML = '<option value="全部城市">全部城市</option>';
-            citySelect.value = '全部城市';
-            state.comprehensive.city = '全部城市';
-            return;
-        }
+        if (!province) return;
         if (MUNICIPALITIES.includes(province)) {
             citySelect.disabled = true;
             citySelect.innerHTML = `<option value="${province}">${province}</option>`;
@@ -1187,7 +1189,7 @@
         const { source, subDataset, scope, selectedEvents, gender, province, city, type } = state.comprehensive;
         if (selectedEvents.length === 0) {
             const tbody = document.getElementById('comp-tbody');
-            if (tbody) tbody.innerHTML = '<tr><td colspan="4">请至少选择一个项目</td></tr>';
+            if (tbody) tbody.innerHTML = '<tr><td colspan="5">请至少选择一个项目</td></tr>';
             return;
         }
 
@@ -1222,7 +1224,7 @@
                         console.log(`项目 ${proj} 范围筛选(国家)后: ${data.length}`);
                     }
                 } else {
-                    if (province !== '全部省份') {
+                    if (province) {
                         data = data.filter(d => d.province === province);
                         console.log(`项目 ${proj} 省份筛选后: ${data.length}`);
                     }
@@ -1321,18 +1323,18 @@
         if (!thead || !tbody) return;
 
         const source = state.comprehensive.source;
-        // 动态生成表头
+        // 动态生成表头，增加“排名总和”列
         let theadHtml = '<tr><th>排名</th><th>姓名</th>';
         if (source === 'province') {
             theadHtml += '<th>省份</th><th>城市</th>';
         } else {
             theadHtml += '<th>国家</th>';
         }
-        theadHtml += '<th>参与项目数</th></tr>';
+        theadHtml += '<th>参与项目数</th><th>排名总和</th></tr>';
         thead.innerHTML = theadHtml;
 
         if (data.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="${source === 'province' ? 5 : 4}">暂无数据</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="${source === 'province' ? 6 : 5}">暂无数据</td></tr>`;
             return;
         }
 
@@ -1360,10 +1362,10 @@
             } else {
                 row += `<td>${item.country || ''}</td>`;
             }
-            row += `<td>${item.eventCount}</td></tr>`;
+            row += `<td>${item.eventCount}</td><td>${item.totalRank}</td></tr>`;
             html += row;
         });
-        tbody.innerHTML = html || `<tr><td colspan="${source === 'province' ? 5 : 4}">暂无数据</td></tr>`;
+        tbody.innerHTML = html || `<tr><td colspan="${source === 'province' ? 6 : 5}">暂无数据</td></tr>`;
     }
 
     // ========== 通用辅助函数 ==========
