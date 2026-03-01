@@ -975,7 +975,7 @@
             </div>
             <div class="filter-section" id="comp-filters">
                 <div class="filter-item">
-                    <label>数据源</label>
+                    <label>排名类型</label>
                     <select id="comp-source">
                         <option value="season">赛季排名</option>
                         <option value="active">现役排名</option>
@@ -983,11 +983,11 @@
                     </select>
                 </div>
                 <div class="filter-item" id="comp-scope-item">
-                    <label>范围</label>
+                    <label>区域范围</label>
                     <select id="comp-scope"></select>
                 </div>
                 <div class="filter-item hidden" id="comp-dataset-item">
-                    <label>数据类型</label>
+                    <label>时期</label>
                     <select id="comp-dataset">
                         <option value="historical">历史最好</option>
                         <option value="season">赛季 (2026)</option>
@@ -1328,7 +1328,7 @@
         if (source === 'province') {
             theadHtml += '<th>省份</th><th>城市</th>';
         } else {
-            theadHtml += '<th>国家</th>';
+            theadHtml += '<th>区域</th>';
         }
         theadHtml += '<th>参与项目数</th><th>排名总和</th></tr>';
         thead.innerHTML = theadHtml;
