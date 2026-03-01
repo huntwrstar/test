@@ -204,8 +204,36 @@
             font-weight: normal;
             text-transform: none;
             color: #333;
-            width: calc(33.33% - 16px);
+            width: calc(25% - 16px);  /* 每行4个 */
             min-width: 100px;
+        }
+        /* 项目标签样式 */
+        .project-tag-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 8px 0;
+        }
+        .project-tag {
+            display: inline-block;
+            padding: 6px 14px;
+            border: 1px solid #ced4da;
+            border-radius: 30px;
+            background-color: #f8f9fa;
+            color: #495057;
+            font-size: 0.95rem;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s;
+        }
+        .project-tag:hover {
+            background-color: #e9ecef;
+            border-color: #adb5bd;
+        }
+        .project-tag.selected {
+            background-color: #4a6ee0;
+            border-color: #4a6ee0;
+            color: white;
         }
         .radio-group {
             display: flex;
@@ -954,10 +982,8 @@
                     </select>
                 </div>
                 <div class="filter-item" style="flex: 2;">
-                    <label>项目（可多选）</label>
-                    <div class="checkbox-group" id="comp-project-group">
-                        ${projectCheckboxes()}
-                    </div>
+                    <label>项目（点击选择）</label>
+                    <div class="project-tag-group" id="comp-project-tags"></div>
                 </div>
                 <div class="filter-item">
                     <label>性别</label>
@@ -984,16 +1010,44 @@
                 <h3><i class="fa fa-info-circle"></i> 当前浏览：<span id="comp-current">赛季排名 - 已选1个项目 (单次)</span></h3>
             </div>
             <div class="table-container">
-                <table><thead><tr><th>排名</th><th>姓名</th><th>区域</th><th>参与项目数</th></tr></thead><tbody id="comp-tbody"></tbody></table>
+                <table id="comp-table">
+                    <thead></thead>
+                    <tbody id="comp-tbody"></tbody>
+                </table>
             </div>
             <div class="pagination-container" id="comp-pagination"></div>
         `;
     }
 
-    function projectCheckboxes() {
-        return PROJECT_LIST.map(p => 
-            `<label><input type="checkbox" value="${p.code}" ${state.comprehensive.selectedEvents.includes(p.code) ? 'checked' : ''}> ${p.name}</label>`
-        ).join('');
+    // 渲染项目标签
+    function renderProjectTags() {
+        const container = document.getElementById('comp-project-tags');
+        if (!container) return;
+        const selected = state.comprehensive.selectedEvents;
+        const html = PROJECT_LIST.map(p => {
+            const isSelected = selected.includes(p.code);
+            return `<span class="project-tag ${isSelected ? 'selected' : ''}" data-code="${p.code}">${p.name}</span>`;
+        }).join('');
+        container.innerHTML = html;
+
+        container.querySelectorAll('.project-tag').forEach(tag => {
+            tag.addEventListener('click', (e) => {
+                const code = tag.dataset.code;
+                let selected = state.comprehensive.selectedEvents.slice();
+                if (selected.includes(code)) {
+                    if (selected.length > 1) {
+                        selected = selected.filter(c => c !== code);
+                    } else {
+                        return; // 至少保留一个
+                    }
+                } else {
+                    selected.push(code);
+                }
+                state.comprehensive.selectedEvents = selected;
+                renderProjectTags(); // 重新渲染以更新选中样式
+                updateCompCurrentLabel(); // 更新当前浏览信息
+            });
+        });
     }
 
     async function initComprehensive() {
@@ -1004,51 +1058,43 @@
         if (sourceSelect) sourceSelect.value = state.comprehensive.source;
         toggleCompFilters(state.comprehensive.source);
 
-        const projectGroup = document.getElementById('comp-project-group');
-        if (projectGroup) {
-            projectGroup.innerHTML = projectCheckboxes();
-            projectGroup.addEventListener('change', () => {
-                const checkboxes = projectGroup.querySelectorAll('input[type=checkbox]');
-                const selected = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
-                state.comprehensive.selectedEvents = selected.length ? selected : ['333'];
-                calculateComprehensive();
-            });
-        }
+        // 渲染项目标签
+        renderProjectTags();
 
-        if (sourceSelect) {
-            sourceSelect.addEventListener('change', (e) => {
-                state.comprehensive.source = e.target.value;
-                toggleCompFilters(e.target.value);
-                calculateComprehensive();
-            });
-        }
+        // 数据源切换
+        sourceSelect?.addEventListener('change', (e) => {
+            state.comprehensive.source = e.target.value;
+            toggleCompFilters(e.target.value);
+            updateCompCurrentLabel(); // 仅更新标签
+        });
 
         document.getElementById('comp-scope')?.addEventListener('change', (e) => {
             state.comprehensive.scope = e.target.value;
-            calculateComprehensive();
+            updateCompCurrentLabel();
         });
 
         document.getElementById('comp-dataset')?.addEventListener('change', (e) => {
             state.comprehensive.subDataset = e.target.value;
-            calculateComprehensive();
+            updateCompCurrentLabel();
         });
 
         document.getElementById('comp-province')?.addEventListener('change', async (e) => {
             state.comprehensive.province = e.target.value;
             await updateCompCitySelect(state.comprehensive.province);
-            calculateComprehensive();
+            updateCompCurrentLabel();
         });
 
         document.getElementById('comp-city')?.addEventListener('change', (e) => {
             state.comprehensive.city = e.target.value;
-            calculateComprehensive();
+            updateCompCurrentLabel();
         });
 
         document.getElementById('comp-gender')?.addEventListener('change', (e) => {
             state.comprehensive.gender = e.target.value;
-            calculateComprehensive();
+            updateCompCurrentLabel();
         });
 
+        // 单次/平均按钮触发计算
         document.getElementById('comp-single')?.addEventListener('click', () => {
             setType('comprehensive', 'single');
             calculateComprehensive();
@@ -1060,6 +1106,7 @@
 
         document.getElementById('comp-tooltip')?.addEventListener('click', showTooltip);
 
+        // 初始加载一次数据
         await calculateComprehensive();
     }
 
@@ -1125,18 +1172,24 @@
         }
     }
 
+    function updateCompCurrentLabel() {
+        const comp = state.comprehensive;
+        const sourceName = comp.source === 'season' ? '赛季' : (comp.source === 'active' ? '现役' : '省市');
+        const typeName = comp.type === 'single' ? '单次' : '平均';
+        const eventCount = comp.selectedEvents.length;
+        document.getElementById('comp-current').innerText = `${sourceName} - 已选${eventCount}个项目 (${typeName})`;
+    }
+
     async function calculateComprehensive() {
         if (state.currentPage !== 'comprehensive') return;
+        updateCompCurrentLabel(); // 更新标签
+
         const { source, subDataset, scope, selectedEvents, gender, province, city, type } = state.comprehensive;
         if (selectedEvents.length === 0) {
             const tbody = document.getElementById('comp-tbody');
             if (tbody) tbody.innerHTML = '<tr><td colspan="4">请至少选择一个项目</td></tr>';
             return;
         }
-
-        const sourceName = source === 'season' ? '赛季' : (source === 'active' ? '现役' : '省市');
-        const currentSpan = document.getElementById('comp-current');
-        if (currentSpan) currentSpan.innerText = `${sourceName} - 已选${selectedEvents.length}个项目 (${type==='single'?'单次':'平均'})`;
 
         const projectDataMap = {};
         const personInfoMap = new Map();
@@ -1173,9 +1226,7 @@
                         data = data.filter(d => d.province === province);
                         console.log(`项目 ${proj} 省份筛选后: ${data.length}`);
                     }
-                    if (city === '全部城市') {
-                        // 不筛选城市
-                    } else if (city) {
+                    if (city !== '全部城市' && city) {
                         data = data.filter(d => d.city === city);
                         console.log(`项目 ${proj} 城市筛选后: ${data.length}`);
                     }
@@ -1229,7 +1280,9 @@
                 results.push({
                     wcaid: wcaid,
                     name: info.name,
-                    region: source !== 'province' ? info.country : (info.province || ''),
+                    country: info.country,
+                    province: info.province,
+                    city: info.city,
                     totalRank: totalRank,
                     eventCount: count
                 });
@@ -1261,15 +1314,28 @@
     }
 
     function renderComprehensiveTable(data) {
+        const table = document.getElementById('comp-table');
+        if (!table) return;
+        const thead = table.querySelector('thead');
         const tbody = document.getElementById('comp-tbody');
-        if (!tbody) return;
+        if (!thead || !tbody) return;
+
+        const source = state.comprehensive.source;
+        // 动态生成表头
+        let theadHtml = '<tr><th>排名</th><th>姓名</th>';
+        if (source === 'province') {
+            theadHtml += '<th>省份</th><th>城市</th>';
+        } else {
+            theadHtml += '<th>国家</th>';
+        }
+        theadHtml += '<th>参与项目数</th></tr>';
+        thead.innerHTML = theadHtml;
+
         if (data.length === 0) {
-            console.warn('综合排名数据为空，显示“暂无数据”');
-            tbody.innerHTML = '<tr><td colspan="4">暂无数据</td></tr>';
+            tbody.innerHTML = `<tr><td colspan="${source === 'province' ? 5 : 4}">暂无数据</td></tr>`;
             return;
         }
 
-        console.log(`渲染综合排名表格，共 ${data.length} 条数据`);
         state.pagination.data = data;
         state.pagination.totalPages = Math.ceil(data.length / 100);
         state.pagination.currentPage = 1;
@@ -1285,14 +1351,19 @@
     }
 
     function renderCompTableBody(tbody, data) {
-        tbody.innerHTML = data.map(item => `
-            <tr>
-                <td class="rank-cell">${item.displayRank}</td>
-                <td>${item.name}</td>
-                <td>${item.region || ''}</td>
-                <td>${item.eventCount}</td>
-            </tr>
-        `).join('');
+        const source = state.comprehensive.source;
+        let html = '';
+        data.forEach(item => {
+            let row = `<tr><td class="rank-cell">${item.displayRank}</td><td>${item.name}</td>`;
+            if (source === 'province') {
+                row += `<td>${item.province || ''}</td><td>${item.city || ''}</td>`;
+            } else {
+                row += `<td>${item.country || ''}</td>`;
+            }
+            row += `<td>${item.eventCount}</td></tr>`;
+            html += row;
+        });
+        tbody.innerHTML = html || `<tr><td colspan="${source === 'province' ? 5 : 4}">暂无数据</td></tr>`;
     }
 
     // ========== 通用辅助函数 ==========
