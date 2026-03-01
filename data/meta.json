@@ -33,7 +33,7 @@
     "Colombia",
     "Congo",
     "Costa Rica",
-    "Cote d_Ivoire",
+    "Cote dIvoire",
     "Croatia",
     "Cuba",
     "Cyprus",
@@ -314,12 +314,12 @@
     "Congo": "非洲",
     "Lesotho": "非洲",
     "Cote d'Ivoire": "非洲",
+    "Cote dIvoire": "非洲",
     "Australia": "大洋洲",
     "New Zealand": "大洋洲",
     "Fiji": "大洋洲",
     "Papua New Guinea": "大洋洲",
     "Samoa": "大洋洲",
-    "Tonga": "大洋洲",
-    "Cote d_Ivoire": "其他"
+    "Tonga": "大洋洲"
   }
 }
