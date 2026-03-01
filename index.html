@@ -502,16 +502,6 @@
         {code:'333mbf', name:'多盲'}
     ];
 
-    // 洲际映射（用于范围筛选）
-    const CONTINENT_MAP = {
-        'China':'亚洲', 'Taiwan':'亚洲', 'Hong Kong':'亚洲', 'Macau':'亚洲',
-        'Japan':'亚洲', 'Korea':'亚洲', 'India':'亚洲', 'Iran':'亚洲', 'Thailand':'亚洲', 'Singapore':'亚洲', 'Malaysia':'亚洲', 'Indonesia':'亚洲', 'Philippines':'亚洲', 'Vietnam':'亚洲',
-        'Russia':'欧洲', 'Germany':'欧洲', 'France':'欧洲', 'UK':'欧洲', 'Poland':'欧洲', 'Spain':'欧洲', 'Italy':'欧洲', 'Netherlands':'欧洲', 'Sweden':'欧洲', 'Denmark':'欧洲', 'Norway':'欧洲', 'Finland':'欧洲', 'Ukraine':'欧洲', 'Czech Republic':'欧洲', 'Hungary':'欧洲',
-        'USA':'北美洲', 'Canada':'北美洲', 'Mexico':'北美洲', 'Brazil':'南美洲', 'Argentina':'南美洲', 'Colombia':'南美洲', 'Peru':'南美洲', 'Chile':'南美洲',
-        'South Africa':'非洲', 'Egypt':'非洲', 'Morocco':'非洲', 'Algeria':'非洲',
-        'Australia':'大洋洲', 'New Zealand':'大洋洲'
-    };
-
     // ========== 工具函数 ==========
     async function fetchJSON(url) {
         console.log(`开始加载: ${url}`);
@@ -1292,7 +1282,7 @@
                 if (source !== 'province') {
                     const [scopeType, scopeValue] = scope.split(':');
                     if (scopeType === 'continent') {
-                        data = data.filter(d => CONTINENT_MAP[d.country] === scopeValue);
+                        data = data.filter(d => applyContinentFilter(d.country, scopeValue));
                         console.log(`项目 ${proj} 范围筛选(洲)后: ${data.length}`);
                     } else if (scopeType === 'country') {
                         data = data.filter(d => d.country === scopeValue);
@@ -1397,6 +1387,12 @@
         renderComprehensiveTable(rankedResults);
     }
 
+    // 辅助函数：根据国家名获取所属大洲（从meta中读取）
+    function applyContinentFilter(country, continent) {
+        const countryContinent = state.meta?.countryContinent || {};
+        return countryContinent[country] === continent;
+    }
+
     function renderComprehensiveTable(data) {
         const table = document.getElementById('comp-table');
         if (!table) return;
@@ -1468,8 +1464,16 @@
         if (state.meta) return;
         try {
             state.meta = await fetchJSON('data/meta.json');
+            // 确保 countryContinent 存在
+            if (!state.meta.countryContinent) {
+                state.meta.countryContinent = {};
+                console.warn('meta.json 缺少 countryContinent 字段，将使用空映射，按洲筛选将无法工作');
+            }
         } catch {
-            state.meta = { countries: [], country_continent: {} };
+            state.meta = { 
+                countries: [], 
+                countryContinent: {} 
+            };
         }
     }
 
@@ -1578,7 +1582,8 @@
 
     function applyScopeFilter(data, continent, country) {
         if (continent) {
-            return data.filter(d => CONTINENT_MAP[d.country] === continent);
+            const countryContinent = state.meta?.countryContinent || {};
+            return data.filter(d => countryContinent[d.country] === continent);
         } else if (country) {
             return data.filter(d => d.country === country);
         }
