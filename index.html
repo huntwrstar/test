@@ -823,7 +823,7 @@
     function renderRegion() {
         return `
             <div class="page-heading">
-                <h2>省市排名 <span class="tooltip-icon" id="region-tooltip" data-tooltip="本页面为省市排名，可以查看中国每个省市区域的选手排名，2018年5月下旬前没有在粗饼网选择归属地的选手将自动加入作者虚构的秘境——神手谷；所有的排名成绩源自WCA赛事的官方排名。">?</span></h2>
+                <h2>省市排名 <span class="tooltip-icon" id="region-tooltip" data-tooltip="本页面为省市排名，可以查看中国选手在其归属地的排名，2018年5月下旬前没有在粗饼网选择归属地的选手将自动加入作者虚构的秘境——神手谷；所有的排名成绩源自WCA赛事的官方排名。">?</span></h2>
             </div>
             <div class="filter-section">
                 <div class="filter-item">
@@ -1042,7 +1042,7 @@
                     </select>
                 </div>
                 <div class="filter-item" id="comp-scope-item">
-                    <label>区域范围</label>
+                    <label>范围</label>
                     <select id="comp-scope"></select>
                 </div>
                 <div class="filter-item hidden" id="comp-dataset-item">
@@ -1407,7 +1407,7 @@
         if (source === 'province') {
             theadHtml += '<th>省份</th><th>城市</th>';
         } else {
-            theadHtml += '<th>区域</th>';
+            theadHtml += '<th>国家</th>';
         }
         theadHtml += '<th>参与项目数</th><th>排名总和</th></tr>';
         thead.innerHTML = theadHtml;
