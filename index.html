@@ -542,7 +542,7 @@
         } else if (page === 'season' || page === 'active') {
             colspan = 6;
         } else if (page === 'comprehensive') {
-            // 综合排名列数动态
+            // 综合排名列数动态，用一个大数确保覆盖
             const source = state.comprehensive.source;
             colspan = source === 'province' ? 6 : 5;
         }
@@ -1244,7 +1244,12 @@
 
     async function calculateComprehensive() {
         if (state.currentPage !== 'comprehensive') return;
+        
+        // 显示加载动画
         showPageLoading('comprehensive');
+        // 强制浏览器渲染动画
+        await new Promise(resolve => setTimeout(resolve, 0));
+        
         updateCompCurrentLabel(); // 更新标签
 
         const { source, subDataset, scope, selectedEvents, gender, province, city, type } = state.comprehensive;
