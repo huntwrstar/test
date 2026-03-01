@@ -639,6 +639,7 @@
     }
 
     async function loadSeasonData() {
+        if (state.currentPage !== 'season') return; // 页面已切换，放弃更新
         const { project, type, gender, continent, country } = state.season;
         updateCurrentLabels('season', project, type);
         try {
@@ -648,7 +649,8 @@
             renderTable('season', data, false);
         } catch (e) {
             console.error(e);
-            document.getElementById('season-tbody').innerHTML = '<tr><td colspan="6">数据加载失败</td></tr>';
+            const tbody = document.getElementById('season-tbody');
+            if (tbody) tbody.innerHTML = '<tr><td colspan="6">数据加载失败</td></tr>';
         }
     }
 
@@ -697,6 +699,7 @@
     }
 
     async function loadActiveData() {
+        if (state.currentPage !== 'active') return;
         const { project, type, gender, continent, country } = state.active;
         updateCurrentLabels('active', project, type);
         try {
@@ -706,7 +709,8 @@
             renderTable('active', data, false);
         } catch (e) {
             console.error(e);
-            document.getElementById('active-tbody').innerHTML = '<tr><td colspan="6">数据加载失败</td></tr>';
+            const tbody = document.getElementById('active-tbody');
+            if (tbody) tbody.innerHTML = '<tr><td colspan="6">数据加载失败</td></tr>';
         }
     }
 
@@ -792,36 +796,46 @@
         }
 
         const provinceSelect = document.getElementById('region-province');
-        provinceSelect.innerHTML = state.region.allProvinces.map(p => `<option value="${p}">${p}</option>`).join('');
-        if (state.region.allProvinces.includes('北京')) {
-            provinceSelect.value = '北京';
-            state.region.province = '北京';
-        } else if (state.region.allProvinces.length > 0) {
-            provinceSelect.value = state.region.allProvinces[0];
-            state.region.province = state.region.allProvinces[0];
+        if (provinceSelect) {
+            provinceSelect.innerHTML = state.region.allProvinces.map(p => `<option value="${p}">${p}</option>`).join('');
+            if (state.region.allProvinces.includes('北京')) {
+                provinceSelect.value = '北京';
+                state.region.province = '北京';
+            } else if (state.region.allProvinces.length > 0) {
+                provinceSelect.value = state.region.allProvinces[0];
+                state.region.province = state.region.allProvinces[0];
+            }
         }
 
         updateRegionCitySelect(state.region.province);
 
-        document.getElementById('region-project').value = state.region.project;
-        document.getElementById('region-gender').value = state.region.gender;
+        const projectSelect = document.getElementById('region-project');
+        if (projectSelect) projectSelect.value = state.region.project;
+        const genderSelect = document.getElementById('region-gender');
+        if (genderSelect) genderSelect.value = state.region.gender;
+
         bindEvents('region', false);
         document.getElementById('region-tooltip')?.addEventListener('click', showTooltip);
 
-        provinceSelect.addEventListener('change', (e) => {
-            state.region.province = e.target.value;
-            updateRegionCitySelect(state.region.province);
-        });
+        if (provinceSelect) {
+            provinceSelect.addEventListener('change', (e) => {
+                state.region.province = e.target.value;
+                updateRegionCitySelect(state.region.province);
+            });
+        }
 
-        document.getElementById('region-city').addEventListener('change', (e) => {
-            state.region.city = e.target.value;
-        });
+        const citySelect = document.getElementById('region-city');
+        if (citySelect) {
+            citySelect.addEventListener('change', (e) => {
+                state.region.city = e.target.value;
+            });
+        }
 
-        document.getElementById('region-single').addEventListener('click', () => {
+        document.getElementById('region-single')?.addEventListener('click', () => {
             setType('region', 'single');
             loadRegionData();
         });
-        document.getElementById('region-average').addEventListener('click', () => {
+        document.getElementById('region-average')?.addEventListener('click', () => {
             setType('region', 'average');
             loadRegionData();
         });
@@ -831,6 +845,7 @@
 
     function updateRegionCitySelect(province) {
         const citySelect = document.getElementById('region-city');
+        if (!citySelect) return;
         if (MUNICIPALITIES.includes(province)) {
             citySelect.disabled = true;
             citySelect.innerHTML = `<option value="${province}">${province}</option>`;
@@ -850,6 +865,7 @@
     }
 
     async function loadRegionData() {
+        if (state.currentPage !== 'region') return;
         const { period, project, type, gender, province, city } = state.region;
         document.getElementById('region-current-project').textContent = getProjectName(project);
         document.getElementById('region-current-type').textContent = type === 'single' ? '单次' : '平均';
@@ -870,7 +886,8 @@
             renderTable('region', data, true);
         } catch (e) {
             console.error(e);
-            document.getElementById('region-tbody').innerHTML = '<tr><td colspan="7">数据加载失败</td></tr>';
+            const tbody = document.getElementById('region-tbody');
+            if (tbody) tbody.innerHTML = '<tr><td colspan="7">数据加载失败</td></tr>';
         }
     }
 
@@ -957,55 +974,59 @@
         populateScopeSelect('comp-scope', state.comprehensive.scope);
 
         const sourceSelect = document.getElementById('comp-source');
-        sourceSelect.value = state.comprehensive.source;
+        if (sourceSelect) sourceSelect.value = state.comprehensive.source;
         toggleCompFilters(state.comprehensive.source);
 
         const projectGroup = document.getElementById('comp-project-group');
-        projectGroup.innerHTML = projectCheckboxes();
-        projectGroup.addEventListener('change', () => {
-            const checkboxes = projectGroup.querySelectorAll('input[type=checkbox]');
-            const selected = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
-            state.comprehensive.selectedEvents = selected.length ? selected : ['333'];
-            calculateComprehensive();
-        });
+        if (projectGroup) {
+            projectGroup.innerHTML = projectCheckboxes();
+            projectGroup.addEventListener('change', () => {
+                const checkboxes = projectGroup.querySelectorAll('input[type=checkbox]');
+                const selected = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
+                state.comprehensive.selectedEvents = selected.length ? selected : ['333'];
+                calculateComprehensive();
+            });
+        }
 
-        sourceSelect.addEventListener('change', (e) => {
-            state.comprehensive.source = e.target.value;
-            toggleCompFilters(e.target.value);
-            calculateComprehensive();
-        });
+        if (sourceSelect) {
+            sourceSelect.addEventListener('change', (e) => {
+                state.comprehensive.source = e.target.value;
+                toggleCompFilters(e.target.value);
+                calculateComprehensive();
+            });
+        }
 
-        document.getElementById('comp-scope').addEventListener('change', (e) => {
+        document.getElementById('comp-scope')?.addEventListener('change', (e) => {
             state.comprehensive.scope = e.target.value;
             calculateComprehensive();
         });
 
-        document.getElementById('comp-dataset').addEventListener('change', (e) => {
+        document.getElementById('comp-dataset')?.addEventListener('change', (e) => {
             state.comprehensive.subDataset = e.target.value;
             calculateComprehensive();
         });
 
-        document.getElementById('comp-province').addEventListener('change', async (e) => {
+        document.getElementById('comp-province')?.addEventListener('change', async (e) => {
             state.comprehensive.province = e.target.value;
             await updateCompCitySelect(state.comprehensive.province);
             calculateComprehensive();
         });
 
-        document.getElementById('comp-city').addEventListener('change', (e) => {
+        document.getElementById('comp-city')?.addEventListener('change', (e) => {
             state.comprehensive.city = e.target.value;
             calculateComprehensive();
         });
 
-        document.getElementById('comp-gender').addEventListener('change', (e) => {
+        document.getElementById('comp-gender')?.addEventListener('change', (e) => {
             state.comprehensive.gender = e.target.value;
             calculateComprehensive();
         });
 
-        document.getElementById('comp-single').addEventListener('click', () => {
+        document.getElementById('comp-single')?.addEventListener('click', () => {
             setType('comprehensive', 'single');
             calculateComprehensive();
         });
-        document.getElementById('comp-average').addEventListener('click', () => {
+        document.getElementById('comp-average')?.addEventListener('click', () => {
             setType('comprehensive', 'average');
             calculateComprehensive();
         });
@@ -1017,10 +1038,14 @@
 
     function toggleCompFilters(source) {
         const isProvince = source === 'province';
-        document.getElementById('comp-scope-item').classList.toggle('hidden', isProvince);
-        document.getElementById('comp-dataset-item').classList.toggle('hidden', !isProvince);
-        document.getElementById('comp-province-item').classList.toggle('hidden', !isProvince);
-        document.getElementById('comp-city-item').classList.toggle('hidden', !isProvince);
+        const scopeItem = document.getElementById('comp-scope-item');
+        const datasetItem = document.getElementById('comp-dataset-item');
+        const provinceItem = document.getElementById('comp-province-item');
+        const cityItem = document.getElementById('comp-city-item');
+        if (scopeItem) scopeItem.classList.toggle('hidden', isProvince);
+        if (datasetItem) datasetItem.classList.toggle('hidden', !isProvince);
+        if (provinceItem) provinceItem.classList.toggle('hidden', !isProvince);
+        if (cityItem) cityItem.classList.toggle('hidden', !isProvince);
         if (isProvince) {
             loadCompProvinceList();
         }
@@ -1031,10 +1056,12 @@
             const data = await fetchJSON(`data/region/historical/single/333.json`);
             const provinces = [...new Set(data.map(d => d.province).filter(p => p))].sort();
             const provinceSelect = document.getElementById('comp-province');
-            provinceSelect.innerHTML = '<option value="全部省份">全部省份</option>' + 
-                provinces.map(p => `<option value="${p}">${p}</option>`).join('');
-            provinceSelect.value = '全部省份';
-            state.comprehensive.province = '全部省份';
+            if (provinceSelect) {
+                provinceSelect.innerHTML = '<option value="全部省份">全部省份</option>' + 
+                    provinces.map(p => `<option value="${p}">${p}</option>`).join('');
+                provinceSelect.value = '全部省份';
+                state.comprehensive.province = '全部省份';
+            }
             await updateCompCitySelect('全部省份');
         } catch (e) {
             console.warn('加载省份列表失败', e);
@@ -1043,6 +1070,7 @@
 
     async function updateCompCitySelect(province) {
         const citySelect = document.getElementById('comp-city');
+        if (!citySelect) return;
         if (province === '全部省份') {
             citySelect.disabled = true;
             citySelect.innerHTML = '<option value="全部城市">全部城市</option>';
@@ -1071,14 +1099,17 @@
     }
 
     async function calculateComprehensive() {
+        if (state.currentPage !== 'comprehensive') return;
         const { source, subDataset, scope, selectedEvents, gender, province, city, type } = state.comprehensive;
         if (selectedEvents.length === 0) {
-            document.getElementById('comp-tbody').innerHTML = '<tr><td colspan="4">请至少选择一个项目</td></tr>';
+            const tbody = document.getElementById('comp-tbody');
+            if (tbody) tbody.innerHTML = '<tr><td colspan="4">请至少选择一个项目</td></tr>';
             return;
         }
 
         const sourceName = source === 'season' ? '赛季' : (source === 'active' ? '现役' : '省市');
-        document.getElementById('comp-current').innerText = `${sourceName} - 已选${selectedEvents.length}个项目 (${type==='single'?'单次':'平均'})`;
+        const currentSpan = document.getElementById('comp-current');
+        if (currentSpan) currentSpan.innerText = `${sourceName} - 已选${selectedEvents.length}个项目 (${type==='single'?'单次':'平均'})`;
 
         const projectDataMap = {}; // 项目代码 -> { rankMap: { wcaid: rank }, maxRank: 该项目的最大排名（即人数） }
         const personInfoMap = new Map();
@@ -1194,6 +1225,7 @@
 
     function renderComprehensiveTable(data) {
         const tbody = document.getElementById('comp-tbody');
+        if (!tbody) return;
         if (data.length === 0) {
             tbody.innerHTML = '<tr><td colspan="4">暂无数据</td></tr>';
             return;
@@ -1264,37 +1296,52 @@
     function bindEvents(page, autoLoad = true) {
         const prefix = page === 'comprehensive' ? 'comp' : page;
         if (page !== 'comprehensive') {
-            document.getElementById(`${prefix}-project`).addEventListener('change', (e) => {
-                state[page].project = e.target.value;
+            const projSelect = document.getElementById(`${prefix}-project`);
+            if (projSelect) {
+                projSelect.addEventListener('change', (e) => {
+                    state[page].project = e.target.value;
+                });
+            }
+        }
+        const genderSelect = document.getElementById(`${prefix}-gender`);
+        if (genderSelect) {
+            genderSelect.addEventListener('change', (e) => {
+                state[page].gender = e.target.value;
             });
         }
-        document.getElementById(`${prefix}-gender`).addEventListener('change', (e) => {
-            state[page].gender = e.target.value;
-        });
         if (prefix !== 'region' && page !== 'comprehensive') {
-            document.getElementById(`${prefix}-scope`).addEventListener('change', (e) => {
-                const val = e.target.value;
-                if (val.startsWith('continent:')) {
-                    state[page].continent = val.split(':')[1];
-                    state[page].country = '';
-                } else if (val.startsWith('country:')) {
-                    state[page].country = val.split(':')[1];
-                    state[page].continent = '';
-                } else {
-                    state[page].continent = '';
-                    state[page].country = '';
-                }
-            });
+            const scopeSelect = document.getElementById(`${prefix}-scope`);
+            if (scopeSelect) {
+                scopeSelect.addEventListener('change', (e) => {
+                    const val = e.target.value;
+                    if (val.startsWith('continent:')) {
+                        state[page].continent = val.split(':')[1];
+                        state[page].country = '';
+                    } else if (val.startsWith('country:')) {
+                        state[page].country = val.split(':')[1];
+                        state[page].continent = '';
+                    } else {
+                        state[page].continent = '';
+                        state[page].country = '';
+                    }
+                });
+            }
         }
         if (page !== 'comprehensive') {
-            document.getElementById(`${prefix}-single`).addEventListener('click', () => {
-                setType(page, 'single');
-                loadPageData(page);
-            });
-            document.getElementById(`${prefix}-average`).addEventListener('click', () => {
-                setType(page, 'average');
-                loadPageData(page);
-            });
+            const singleBtn = document.getElementById(`${prefix}-single`);
+            const avgBtn = document.getElementById(`${prefix}-average`);
+            if (singleBtn) {
+                singleBtn.addEventListener('click', () => {
+                    setType(page, 'single');
+                    loadPageData(page);
+                });
+            }
+            if (avgBtn) {
+                avgBtn.addEventListener('click', () => {
+                    setType(page, 'average');
+                    loadPageData(page);
+                });
+            }
         }
     }
 
@@ -1304,11 +1351,15 @@
         const singleBtn = document.getElementById(`${prefix}-single`);
         const avgBtn = document.getElementById(`${prefix}-average`);
         if (type === 'single') {
-            singleBtn.classList.add('btn-warning'); singleBtn.classList.remove('btn-primary');
-            avgBtn.classList.add('btn-primary'); avgBtn.classList.remove('btn-warning');
+            singleBtn?.classList.add('btn-warning');
+            singleBtn?.classList.remove('btn-primary');
+            avgBtn?.classList.add('btn-primary');
+            avgBtn?.classList.remove('btn-warning');
         } else {
-            avgBtn.classList.add('btn-warning'); avgBtn.classList.remove('btn-primary');
-            singleBtn.classList.add('btn-primary'); singleBtn.classList.remove('btn-warning');
+            avgBtn?.classList.add('btn-warning');
+            avgBtn?.classList.remove('btn-primary');
+            singleBtn?.classList.add('btn-primary');
+            singleBtn?.classList.remove('btn-warning');
         }
     }
 
@@ -1320,8 +1371,10 @@
     }
 
     function updateCurrentLabels(page, project, type) {
-        document.getElementById(`${page}-current-project`).textContent = getProjectName(project);
-        document.getElementById(`${page}-current-type`).textContent = type === 'single' ? '单次' : '平均';
+        const projSpan = document.getElementById(`${page}-current-project`);
+        const typeSpan = document.getElementById(`${page}-current-type`);
+        if (projSpan) projSpan.textContent = getProjectName(project);
+        if (typeSpan) typeSpan.textContent = type === 'single' ? '单次' : '平均';
     }
 
     function applyGenderFilter(data, gender) {
@@ -1339,13 +1392,15 @@
     }
 
     function renderTable(page, data, regionMode = false) {
+        const tbody = document.getElementById(`${page}-tbody`);
+        if (!tbody) return; // 元素不存在，不渲染
+
         const scoreKey = state[page].type === 'single' ? '单次成绩(百分之一秒)' : '平均成绩(百分之一秒)';
         const ranked = recomputeRanks(data, scoreKey);
         state.pagination.data = ranked;
         state.pagination.totalPages = Math.ceil(ranked.length / 100);
         state.pagination.currentPage = 1;
 
-        const tbody = document.getElementById(`${page}-tbody`);
         const pageData = paginate(ranked, 1);
         renderTableBody(tbody, pageData, regionMode);
 
@@ -1357,6 +1412,7 @@
     }
 
     function renderTableBody(tbody, data, regionMode) {
+        if (!tbody) return;
         if (regionMode) {
             tbody.innerHTML = data.map(item => `
                 <tr>
