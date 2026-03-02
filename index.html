@@ -1787,7 +1787,9 @@
         const gender = state.record.gender;
 
         document.getElementById('record-current-province').textContent = province;
-        document.getElementById('record-current-city').textContent = city;
+        // 修改：如果 city === '全部城市'，显示“全省”，否则显示原城市名
+        let displayCity = (city === '全部城市') ? '全省' : city;
+        document.getElementById('record-current-city').textContent = displayCity;
         let genderText = '所有';
         if (gender === '男') genderText = '男';
         else if (gender === '女') genderText = '女';
