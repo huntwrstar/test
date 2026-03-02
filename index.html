@@ -799,7 +799,7 @@
                 </div>
             </div>
             <div class="current-info">
-                <h3><i class="fa fa-info-circle"></i> 当前浏览：<span id="season-current-project">三阶</span> - <span id="season-current-type">单次</span></h3>
+                <h3><i class="fa fa-info-circle"></i> 当前：<span id="season-current-project">三阶</span> - <span id="season-current-type">单次</span></h3>
             </div>
             <div class="table-container">
                 <table><thead><tr><th>排名</th><th>姓名</th><th>国家</th><th>成绩</th><th>比赛</th><th>WCA ID</th></tr></thead><tbody id="season-tbody"></tbody></table>
@@ -865,7 +865,7 @@
                 </div>
             </div>
             <div class="current-info">
-                <h3><i class="fa fa-info-circle"></i> 当前浏览：<span id="active-current-project">三阶</span> - <span id="active-current-type">单次</span></h3>
+                <h3><i class="fa fa-info-circle"></i> 当前：<span id="active-current-project">三阶</span> - <span id="active-current-type">单次</span></h3>
             </div>
             <div class="table-container">
                 <table><thead><tr><th>排名</th><th>姓名</th><th>国家</th><th>成绩</th><th>比赛</th><th>WCA ID</th></tr></thead><tbody id="active-tbody"></tbody></table>
@@ -943,7 +943,7 @@
                 </div>
             </div>
             <div class="current-info">
-                <h3><i class="fa fa-info-circle"></i> 当前浏览：<span id="region-current-project">三阶</span> - <span id="region-current-type">单次</span> <span id="region-current-period">历史</span></h3>
+                <h3><i class="fa fa-info-circle"></i> 当前：<span id="region-current-project">三阶</span> - <span id="region-current-type">单次</span> <span id="region-current-period">历史</span></h3>
             </div>
             <div class="table-container">
                 <table id="region-table">
@@ -1157,7 +1157,7 @@
                 </div>
             </div>
             <div class="current-info">
-                <h3><i class="fa fa-info-circle"></i> 当前浏览：<span id="comp-current">赛季排名 - 已选1个项目 (单次)</span></h3>
+                <h3><i class="fa fa-info-circle"></i> 当前：<span id="comp-current">赛季排名 - 已选1个项目 (单次)</span></h3>
             </div>
             <!-- 综合排名专用加载指示器 -->
             <div id="comp-loading" class="loading-indicator" style="display: none;">
@@ -1580,7 +1580,7 @@
                 </div>
             </div>
             <div class="current-info">
-                <h3><i class="fa fa-map-marker-alt"></i> 当前筛选：<span id="record-current-province">北京</span> · <span id="record-current-city">全部城市</span> · <span id="record-current-gender">所有</span></h3>
+                <h3><i class="fa fa-map-marker-alt"></i> 当前：<span id="record-current-province">北京</span> · <span id="record-current-city">全部城市</span> · <span id="record-current-gender">所有</span></h3>
             </div>
             <div class="table-container">
                 <table id="record-table">
@@ -1770,7 +1770,7 @@
         else if (gender === '未知') genderText = '未知';
         document.getElementById('record-current-gender').textContent = genderText;
 
-        tbody.innerHTML = '<tr><td colspan="5" class="loading-cell"><i class="fas fa-spinner"></i> 生成纪录表<span class="loading-dots"></span></td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" class="loading-cell"><i class="fas fa-spinner"></i> 加载纪录表<span class="loading-dots"></span></td></tr>';
         await new Promise(resolve => setTimeout(resolve, 20));
 
         const bestMap = computeBestForFilters(province, city, gender);
