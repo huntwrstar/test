@@ -512,48 +512,33 @@
             .table-container td {
                 padding: 8px 6px;
                 font-size: 0.8rem;
+                /* 确保单元格内容不换行，通过水平滚动查看完整内容 */
+                white-space: nowrap;
+                max-width: none;
+                overflow: visible;
+                text-overflow: clip;
             }
 
-            /* 赛季 / 现役表格：限制国家列宽度 */
-            #season-table th:nth-child(3),
-            #season-table td:nth-child(3),
-            #active-table th:nth-child(3),
-            #active-table td:nth-child(3) {
-                max-width: 60px;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
+            /* 移除所有特定列的宽度限制和换行设置，保持全局 nowrap */
+            #season-table th,
+            #season-table td,
+            #active-table th,
+            #active-table td,
+            #region-table th,
+            #region-table td,
+            #comp-table th,
+            #comp-table td {
+                white-space: nowrap !important;
+                max-width: none !important;
+                overflow: visible !important;
+                text-overflow: clip !important;
             }
 
-            /* 省市排名表格：限制省份和城市列宽度 */
-            #region-table th:nth-child(3),
-            #region-table td:nth-child(3),
-            #region-table th:nth-child(4),
-            #region-table td:nth-child(4) {
-                max-width: 70px;
-                overflow: hidden;
-                text-overflow: ellipsis;
+            /* 省市纪录表格：项目名较长，但也不需要换行，保持单行 */
+            #record-table th,
+            #record-table td {
                 white-space: nowrap;
             }
-
-            /* 综合排名表格：限制姓名、国家/省份列宽度 */
-            #comp-table th:nth-child(2),
-            #comp-table td:nth-child(2) {
-                max-width: 80px;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-            }
-            /* 根据数据源不同，国家/省份列位置不同：默认第3列是国家/省份，也做限制 */
-            #comp-table th:nth-child(3),
-            #comp-table td:nth-child(3) {
-                max-width: 60px;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-            }
-
-            /* 省市纪录表格：项目名较长，但不需要特别限制，保持可读性 */
         }
 
         /* ----- 新增：手机端首页标题在逗号后换行 ----- */
@@ -1107,7 +1092,8 @@
         } else {
             citySelect.disabled = false;
             const cities = state.region.provinceCities[province] || [];
-            let options = '<option value="全部城市">全部城市</option>';
+            // 修改：将“全部城市”改为“全省”
+            let options = '<option value="全部城市">全省</option>';
             cities.forEach(c => {
                 options += `<option value="${c}">${c}</option>`;
             });
@@ -1360,7 +1346,8 @@
             const data = await fetchJSON(`data/region/historical/single/333.json`);
             const cities = [...new Set(data.filter(d => d.province === province).map(d => d.city).filter(c => c))].sort();
             citySelect.disabled = false;
-            citySelect.innerHTML = '<option value="全部城市">全部城市</option>' + 
+            // 修改：将“全部城市”改为“全省”
+            citySelect.innerHTML = '<option value="全部城市">全省</option>' + 
                 cities.map(c => `<option value="${c}">${c}</option>`).join('');
             citySelect.value = '全部城市';
             state.comprehensive.city = '全部城市';
@@ -1668,7 +1655,8 @@
         } else {
             citySelect.disabled = false;
             const cities = extractCitiesFromRawData(province);
-            let options = '<option value="全部城市">全部城市</option>';
+            // 修改：将“全部城市”改为“全省”
+            let options = '<option value="全部城市">全省</option>';
             cities.forEach(c => options += `<option value="${c}">${c}</option>`);
             citySelect.innerHTML = options;
             if (!cities.includes(state.record.city) && state.record.city !== '全部城市') {
