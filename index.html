@@ -98,17 +98,17 @@
 /* 手机端：logo 区域不换行、自动适配字体 */
 @media (max-width: 640px) {
     .header {
-        padding: 12px 20px;          /* 适当缩小两侧内边距 */
+        padding: 12px 20px;
     }
     .logo-area {
-        gap: 6px;                    /* 缩小标题与标语间距 */
+        gap: 6px;
     }
     .logo-area h1 {
-        font-size: 1.4rem;           /* 缩小主标题 */
-        white-space: nowrap;          /* 强制不换行 */
+        font-size: 1.4rem;
+        white-space: nowrap;
     }
     .logo-area span {
-        font-size: 0.85rem;           /* 缩小标语 */
+        font-size: 0.85rem;
         white-space: nowrap;
     }
 }
@@ -262,7 +262,7 @@
             transition: all 0.2s;
             text-align: center;
             flex: 0 0 auto;
-            width: calc(12.5% - 7px); /* 每行8个，减去gap */
+            width: calc(12.5% - 7px);
             min-width: 70px;
         }
         .project-tag:hover {
@@ -348,6 +348,7 @@
         }
         .table-container {
             overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
             border: 1px solid #dee2e6;
             margin-bottom: 25px;
         }
@@ -482,7 +483,7 @@
             margin-right: 10px;
         }
 
-        /* 省市纪录专用表格样式 (取自示例，融入原站) */
+        /* 省市纪录专用表格样式 */
         .region-cell {
             background-color: #f0f7ff !important;
             font-weight: bold;
@@ -504,6 +505,56 @@
         #record-table .region-cell td {
             text-align: left;
         }
+
+        /* ========== 手机端表格优化 ========== */
+        @media (max-width: 640px) {
+            .table-container th,
+            .table-container td {
+                padding: 8px 6px;
+                font-size: 0.8rem;
+            }
+
+            /* 赛季 / 现役表格：限制国家列宽度 */
+            #season-table th:nth-child(3),
+            #season-table td:nth-child(3),
+            #active-table th:nth-child(3),
+            #active-table td:nth-child(3) {
+                max-width: 60px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            /* 省市排名表格：限制省份和城市列宽度 */
+            #region-table th:nth-child(3),
+            #region-table td:nth-child(3),
+            #region-table th:nth-child(4),
+            #region-table td:nth-child(4) {
+                max-width: 70px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            /* 综合排名表格：限制姓名、国家/省份列宽度 */
+            #comp-table th:nth-child(2),
+            #comp-table td:nth-child(2) {
+                max-width: 80px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+            /* 根据数据源不同，国家/省份列位置不同：默认第3列是国家/省份，也做限制 */
+            #comp-table th:nth-child(3),
+            #comp-table td:nth-child(3) {
+                max-width: 60px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            /* 省市纪录表格：项目名较长，但不需要特别限制，保持可读性 */
+        }
     </style>
 </head>
 <body>
@@ -522,7 +573,7 @@
             <a href="#active" class="nav-item" data-page="active">现役排名</a>
             <a href="#region" class="nav-item" data-page="region">省市排名</a>
             <a href="#comprehensive" class="nav-item" data-page="comprehensive">综合排名</a>
-            <a href="#record" class="nav-item" data-page="record">省市纪录</a>   <!-- 新增省市纪录页 -->
+            <a href="#record" class="nav-item" data-page="record">省市纪录</a>
         </div>
         <div class="mobile-menu-icon" id="mobile-menu-icon">☰</div>
         <div class="mobile-nav" id="mobile-nav"></div>
@@ -549,25 +600,24 @@
             provinceCities: {}
         },
         comprehensive: { 
-            source: 'season',                 // season, active, province
-            subDataset: 'historical',          // 当source=province时使用
-            scope: 'country:China',            // 范围（用于非省市）
-            selectedEvents: ['333'],            // 选中的项目
+            source: 'season',
+            subDataset: 'historical',
+            scope: 'country:China',
+            selectedEvents: ['333'],
             gender: 'all',
-            province: '',                       // 默认省份，会在加载列表后设置第一个
+            province: '',
             city: '全部城市',
-            type: 'single',                     // single / average
+            type: 'single',
             rankedData: [],
             currentPage: 1
         },
-        // 新增省市纪录状态
         record: {
             province: '北京',
             city: '全部城市',
             gender: 'all',
             allProvinces: [],
-            provinceCities: {},          // 省份 -> 城市列表
-            rawDataByProject: {},        // { projectCode: { single: [], average: [] } } 存储原始数据
+            provinceCities: {},
+            rawDataByProject: {},
             dataLoaded: false,
             loading: false
         },
@@ -620,16 +670,14 @@
         if (!tbody) return;
         let colspan = 6; // 默认
         if (page === 'region') {
-            // 省市排名：现在始终显示比赛列，所以列数为7
             colspan = 7;
         } else if (page === 'season' || page === 'active') {
             colspan = 6;
         } else if (page === 'comprehensive') {
-            // 综合排名列数动态计算
             const source = state.comprehensive.source;
             colspan = source === 'province' ? 6 : 5;
         } else if (page === 'record') {
-            colspan = 5; // 省市纪录去掉日期列后固定5列
+            colspan = 5;
         }
         tbody.innerHTML = `<tr><td colspan="${colspan}" class="loading-cell"><i class="fas fa-spinner"></i> 加载中<span class="loading-dots"></span></td></tr>`;
     }
@@ -752,7 +800,7 @@
             case 'active': app.innerHTML = renderActive(); await initActive(); break;
             case 'region': app.innerHTML = renderRegion(); await initRegion(); break;
             case 'comprehensive': app.innerHTML = renderComprehensive(); await initComprehensive(); break;
-            case 'record': app.innerHTML = renderRecord(); await initRecord(); break;   // 新增
+            case 'record': app.innerHTML = renderRecord(); await initRecord(); break;
             default: window.location.hash = '#home';
         }
     }
@@ -802,7 +850,7 @@
                 <h3><i class="fa fa-info-circle"></i> 当前：<span id="season-current-project">三阶</span> - <span id="season-current-type">单次</span></h3>
             </div>
             <div class="table-container">
-                <table><thead><tr><th>排名</th><th>姓名</th><th>国家</th><th>成绩</th><th>比赛</th><th>WCA ID</th></tr></thead><tbody id="season-tbody"></tbody></table>
+                <table id="season-table"><thead><tr><th>排名</th><th>姓名</th><th>国家</th><th>成绩</th><th>比赛</th><th>WCA ID</th></tr></thead><tbody id="season-tbody"></tbody></table>
             </div>
             <div class="pagination-container" id="season-pagination"></div>
         `;
@@ -868,7 +916,7 @@
                 <h3><i class="fa fa-info-circle"></i> 当前：<span id="active-current-project">三阶</span> - <span id="active-current-type">单次</span></h3>
             </div>
             <div class="table-container">
-                <table><thead><tr><th>排名</th><th>姓名</th><th>国家</th><th>成绩</th><th>比赛</th><th>WCA ID</th></tr></thead><tbody id="active-tbody"></tbody></table>
+                <table id="active-table"><thead><tr><th>排名</th><th>姓名</th><th>国家</th><th>成绩</th><th>比赛</th><th>WCA ID</th></tr></thead><tbody id="active-tbody"></tbody></table>
             </div>
             <div class="pagination-container" id="active-pagination"></div>
         `;
@@ -1070,7 +1118,6 @@
         document.getElementById('region-current-period').textContent = 
             period === 'historical' ? '历史最好' : (period === 'season' ? '赛季' : '现役');
 
-        // 动态更新表头：始终显示比赛列（取消历史隐藏）
         const thead = document.querySelector('#region-table thead');
         if (thead) {
             thead.innerHTML = `<tr>
@@ -1094,7 +1141,6 @@
                 console.log(`省市数据省份筛选后 (${province}): ${data.length}`);
             }
             if (city === '全部城市') {
-                // 不做城市筛选
             } else if (city) {
                 data = data.filter(d => d.city === city);
                 console.log(`省市数据城市筛选后 (${city}): ${data.length}`);
@@ -1113,7 +1159,6 @@
             <div class="page-heading">
                 <h2>综合排名 <span class="tooltip-icon" id="comp-tooltip" data-tooltip="本页面为综合排名，可计算选手在多个项目的排名总和进行排名。">?</span></h2>
             </div>
-            <!-- 项目标签独立于筛选区，放在上方 -->
             <div style="margin-bottom: 15px;">
                 <label style="font-size: 0.85rem; font-weight: 600; text-transform: uppercase; color: #6c757d; margin-bottom: 5px; display: block;">项目（点击选择）</label>
                 <div class="project-tag-group" id="comp-project-tags"></div>
@@ -1159,7 +1204,6 @@
             <div class="current-info">
                 <h3><i class="fa fa-info-circle"></i> 当前：<span id="comp-current">赛季排名 - 已选1个项目 (单次)</span></h3>
             </div>
-            <!-- 综合排名专用加载指示器 -->
             <div id="comp-loading" class="loading-indicator" style="display: none;">
                 <i class="fas fa-spinner fa-spin"></i> 正在计算综合排名，请稍候...
             </div>
@@ -1192,14 +1236,14 @@
                     if (selected.length > 1) {
                         selected = selected.filter(c => c !== code);
                     } else {
-                        return; // 至少保留一个
+                        return;
                     }
                 } else {
                     selected.push(code);
                 }
                 state.comprehensive.selectedEvents = selected;
-                renderProjectTags(); // 重新渲染以更新选中样式
-                updateCompCurrentLabel(); // 更新当前浏览信息
+                renderProjectTags();
+                updateCompCurrentLabel();
             });
         });
     }
@@ -1212,14 +1256,12 @@
         if (sourceSelect) sourceSelect.value = state.comprehensive.source;
         toggleCompFilters(state.comprehensive.source);
 
-        // 渲染项目标签
         renderProjectTags();
 
-        // 数据源切换
         sourceSelect?.addEventListener('change', (e) => {
             state.comprehensive.source = e.target.value;
             toggleCompFilters(e.target.value);
-            updateCompCurrentLabel(); // 仅更新标签
+            updateCompCurrentLabel();
         });
 
         document.getElementById('comp-scope')?.addEventListener('change', (e) => {
@@ -1248,7 +1290,6 @@
             updateCompCurrentLabel();
         });
 
-        // 单次/平均按钮触发计算
         document.getElementById('comp-single')?.addEventListener('click', () => {
             setType('comprehensive', 'single');
             calculateComprehensive();
@@ -1260,7 +1301,6 @@
 
         document.getElementById('comp-tooltip')?.addEventListener('click', showTooltip);
 
-        // 初始加载一次数据
         await calculateComprehensive();
     }
 
@@ -1285,9 +1325,7 @@
             const provinces = [...new Set(data.map(d => d.province).filter(p => p))].sort();
             const provinceSelect = document.getElementById('comp-province');
             if (provinceSelect) {
-                // 去掉“全部省份”选项，直接填充省份
                 provinceSelect.innerHTML = provinces.map(p => `<option value="${p}">${p}</option>`).join('');
-                // 默认选中第一个
                 if (provinces.length > 0) {
                     provinceSelect.value = provinces[0];
                     state.comprehensive.province = provinces[0];
@@ -1339,15 +1377,13 @@
         const tbody = document.getElementById('comp-tbody');
         const paginationDiv = document.getElementById('comp-pagination');
 
-        // 显示加载指示器，清空旧表格
         if (loadingDiv) loadingDiv.style.display = 'block';
         if (tbody) tbody.innerHTML = '';
         if (paginationDiv) paginationDiv.innerHTML = '';
 
-        // 让出事件循环，确保加载指示器被渲染
         await new Promise(resolve => setTimeout(resolve, 0));
 
-        updateCompCurrentLabel(); // 更新标签
+        updateCompCurrentLabel();
 
         const { source, subDataset, scope, selectedEvents, gender, province, city, type } = state.comprehensive;
         if (selectedEvents.length === 0) {
@@ -1475,19 +1511,16 @@
             }
         });
 
-        // 确保最小显示时间（500ms）
         const elapsed = Date.now() - startTime;
         if (elapsed < 500) {
             await new Promise(resolve => setTimeout(resolve, 500 - elapsed));
         }
 
-        // 隐藏加载指示器
         if (loadingDiv) loadingDiv.style.display = 'none';
 
         renderComprehensiveTable(rankedResults);
     }
 
-    // 辅助函数：根据国家名获取所属大洲（从meta中读取）
     function applyContinentFilter(country, continent) {
         const countryContinent = state.meta?.country_continent || {};
         return countryContinent[country] === continent;
@@ -1501,7 +1534,6 @@
         if (!thead || !tbody) return;
 
         const source = state.comprehensive.source;
-        // 动态生成表头，增加“排名总和”列
         let theadHtml = '<tr><th>排名</th><th>姓名</th>';
         if (source === 'province') {
             theadHtml += '<th>省份</th><th>城市</th>';
@@ -1523,12 +1555,10 @@
         const pageData = paginate(data, 1);
         renderCompTableBody(tbody, pageData);
 
-        // 定义翻页回调
         const onPageChange = (newPage) => {
             state.pagination.currentPage = newPage;
             const newPageData = paginate(data, newPage);
             renderCompTableBody(tbody, newPageData);
-            // 重新渲染分页组件，并传入当前的回调函数（递归调用）
             renderPagination('comp-pagination', state.pagination.totalPages, newPage, onPageChange);
         };
 
@@ -1693,7 +1723,6 @@
             const singleBest = { value: Infinity, record: null };
             const avgBest = { value: Infinity, record: null };
 
-            // 单次
             const singleList = state.record.rawDataByProject[proj.code]?.single || [];
             singleList.forEach(item => {
                 if (item.province !== province) return;
@@ -1717,7 +1746,6 @@
                 }
             });
 
-            // 平均
             const avgList = state.record.rawDataByProject[proj.code]?.average || [];
             avgList.forEach(item => {
                 if (item.province !== province) return;
@@ -1835,10 +1863,9 @@
             genderSelect.value = state.record.gender;
         }
 
-        // 修改：筛选条件变更时不自动刷新，只更新状态
         provinceSelect?.addEventListener('change', (e) => {
             state.record.province = e.target.value;
-            state.record.city = '全部城市'; // 切换省份时重置城市为全部
+            state.record.city = '全部城市';
             updateRecordCitySelect(state.record.province);
         });
 
@@ -1851,12 +1878,10 @@
             state.record.gender = e.target.value;
         });
 
-        // 刷新按钮点击时加载数据
         document.getElementById('record-refresh')?.addEventListener('click', () => {
             loadRecordData();
         });
 
-        // 初始加载一次数据
         await loadRecordData();
     }
 
@@ -1878,7 +1903,6 @@
         if (state.meta) return;
         try {
             state.meta = await fetchJSON('data/meta.json');
-            // 确保 country_continent 存在（使用下划线命名）
             if (!state.meta.country_continent) {
                 state.meta.country_continent = {};
                 console.warn('meta.json 缺少 country_continent 字段，将使用空映射，按洲筛选将无法工作');
@@ -2021,12 +2045,10 @@
         const pageData = paginate(ranked, 1);
         renderTableBody(tbody, pageData, page === 'region');
 
-        // 定义翻页回调
         const onPageChange = (newPage) => {
             state.pagination.currentPage = newPage;
             const newPageData = paginate(ranked, newPage);
             renderTableBody(tbody, newPageData, page === 'region');
-            // 重新渲染分页组件，并传入当前的回调函数
             renderPagination(`${page}-pagination`, state.pagination.totalPages, newPage, onPageChange);
         };
 
@@ -2036,7 +2058,6 @@
     function renderTableBody(tbody, data, regionMode) {
         if (!tbody) return;
         if (regionMode) {
-            // 省市排名：始终显示比赛列（取消历史隐藏）
             tbody.innerHTML = data.map(item => {
                 return `<tr>
                     <td class="rank-cell">${item.displayRank || item.rank}</td>
