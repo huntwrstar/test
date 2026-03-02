@@ -620,8 +620,8 @@
         if (!tbody) return;
         let colspan = 6; // 默认
         if (page === 'region') {
-            // 省市排名：根据时期决定是否有比赛列
-            colspan = state.region.period === 'historical' ? 6 : 7;
+            // 省市排名：现在始终显示比赛列，所以列数为7
+            colspan = 7;
         } else if (page === 'season' || page === 'active') {
             colspan = 6;
         } else if (page === 'comprehensive') {
@@ -629,7 +629,7 @@
             const source = state.comprehensive.source;
             colspan = source === 'province' ? 6 : 5;
         } else if (page === 'record') {
-            colspan = 6; // 省市纪录固定6列
+            colspan = 5; // 省市纪录去掉日期列后固定5列
         }
         tbody.innerHTML = `<tr><td colspan="${colspan}" class="loading-cell"><i class="fas fa-spinner"></i> 加载中<span class="loading-dots"></span></td></tr>`;
     }
@@ -1070,17 +1070,16 @@
         document.getElementById('region-current-period').textContent = 
             period === 'historical' ? '历史最好' : (period === 'season' ? '赛季' : '现役');
 
-        // 动态更新表头
+        // 动态更新表头：始终显示比赛列（取消历史隐藏）
         const thead = document.querySelector('#region-table thead');
         if (thead) {
-            const showCompetition = period !== 'historical';
             thead.innerHTML = `<tr>
                 <th>排名</th>
                 <th>姓名</th>
                 <th>省份</th>
                 <th>城市</th>
                 <th>成绩</th>
-                ${showCompetition ? '<th>比赛</th>' : ''}
+                <th>比赛</th>
                 <th>WCA ID</th>
             </tr>`;
         }
@@ -1587,16 +1586,15 @@
                 <table id="record-table">
                     <thead>
                         <tr>
-                            <th width="10%">项目</th>
-                            <th width="10%">单次</th>
-                            <th width="10%">平均</th>
-                            <th width="15%">姓名</th>
-                            <th width="30%">比赛</th>
-                            <th width="15%">日期</th>
+                            <th width="15%">项目</th>
+                            <th width="15%">单次</th>
+                            <th width="15%">平均</th>
+                            <th width="20%">姓名</th>
+                            <th width="35%">比赛</th>
                         </tr>
                     </thead>
                     <tbody id="record-tbody">
-                        <tr><td colspan="6" class="loading-cell"><i class="fas fa-spinner"></i> 加载数据<span class="loading-dots"></span></td></tr>
+                        <tr><td colspan="5" class="loading-cell"><i class="fas fa-spinner"></i> 加载数据<span class="loading-dots"></span></td></tr>
                     </tbody>
                 </table>
             </div>
@@ -1756,7 +1754,7 @@
         const tbody = document.getElementById('record-tbody');
         if (!tbody) return;
         if (!state.record.dataLoaded) {
-            tbody.innerHTML = '<tr><td colspan="6" class="loading-cell"><i class="fas fa-spinner"></i> 数据未就绪</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" class="loading-cell"><i class="fas fa-spinner"></i> 数据未就绪</td></tr>';
             return;
         }
 
@@ -1772,7 +1770,7 @@
         else if (gender === '未知') genderText = '未知';
         document.getElementById('record-current-gender').textContent = genderText;
 
-        tbody.innerHTML = '<tr><td colspan="6" class="loading-cell"><i class="fas fa-spinner"></i> 生成纪录表<span class="loading-dots"></span></td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" class="loading-cell"><i class="fas fa-spinner"></i> 生成纪录表<span class="loading-dots"></span></td></tr>';
         await new Promise(resolve => setTimeout(resolve, 20));
 
         const bestMap = computeBestForFilters(province, city, gender);
@@ -1783,10 +1781,10 @@
             const singleRec = projBest.single;
             const avgRec = projBest.average;
 
-            html += `<tr class="region-cell"><td colspan="6">${proj.name}</td></tr>`;
+            html += `<tr class="region-cell"><td colspan="5">${proj.name}</td></tr>`;
 
             if (!singleRec && !avgRec) {
-                html += `<tr><td colspan="6" class="empty-cell">暂无纪录</td></tr>`;
+                html += `<tr><td colspan="5" class="empty-cell">暂无纪录</td></tr>`;
             } else {
                 if (singleRec) {
                     html += `<tr>
@@ -1795,7 +1793,6 @@
                         <td></td>
                         <td>${singleRec.name}</td>
                         <td>${singleRec.competition || ''}</td>
-                        <td>${singleRec.date || ''}</td>
                     </tr>`;
                 }
                 if (avgRec) {
@@ -1805,12 +1802,11 @@
                         <td>${formatResult(avgRec.result)}</td>
                         <td>${avgRec.name}</td>
                         <td>${avgRec.competition || ''}</td>
-                        <td>${avgRec.date || ''}</td>
                     </tr>`;
                 }
             }
         }
-        tbody.innerHTML = html || '<tr><td colspan="6">暂无数据</td></tr>';
+        tbody.innerHTML = html || '<tr><td colspan="5">暂无数据</td></tr>';
     }
 
     // 初始化省市纪录页
@@ -1839,28 +1835,28 @@
             genderSelect.value = state.record.gender;
         }
 
+        // 修改：筛选条件变更时不自动刷新，只更新状态
         provinceSelect?.addEventListener('change', (e) => {
             state.record.province = e.target.value;
-            state.record.city = '全部城市';
+            state.record.city = '全部城市'; // 切换省份时重置城市为全部
             updateRecordCitySelect(state.record.province);
-            loadRecordData();
         });
 
         const citySelect = document.getElementById('record-city');
         citySelect?.addEventListener('change', (e) => {
             state.record.city = e.target.value;
-            loadRecordData();
         });
 
         genderSelect?.addEventListener('change', (e) => {
             state.record.gender = e.target.value;
-            loadRecordData();
         });
 
+        // 刷新按钮点击时加载数据
         document.getElementById('record-refresh')?.addEventListener('click', () => {
             loadRecordData();
         });
 
+        // 初始加载一次数据
         await loadRecordData();
     }
 
@@ -2040,20 +2036,17 @@
     function renderTableBody(tbody, data, regionMode) {
         if (!tbody) return;
         if (regionMode) {
-            const period = state.region.period;
-            const showCompetition = period !== 'historical';
+            // 省市排名：始终显示比赛列（取消历史隐藏）
             tbody.innerHTML = data.map(item => {
-                let row = `<tr>
+                return `<tr>
                     <td class="rank-cell">${item.displayRank || item.rank}</td>
                     <td>${item.name}</td>
                     <td>${item.province || ''}</td>
                     <td>${item.city || ''}</td>
-                    <td>${formatResult(item.result)}</td>`;
-                if (showCompetition) {
-                    row += `<td>${item.competition || ''}</td>`;
-                }
-                row += `<td>${item.wcaid}</td></tr>`;
-                return row;
+                    <td>${formatResult(item.result)}</td>
+                    <td>${item.competition || ''}</td>
+                    <td>${item.wcaid}</td>
+                </tr>`;
             }).join('');
         } else {
             tbody.innerHTML = data.map(item => `
