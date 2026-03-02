@@ -506,6 +506,14 @@
             text-align: left;
         }
 
+        /* ========== 首页标语 ========== */
+        .home-slogan {
+            font-size: 2.5rem;
+            color: #4a6ee0;
+            text-align: center;
+            margin: 50px 0;
+        }
+
         /* ========== 手机端表格优化 ========== */
         @media (max-width: 640px) {
             .table-container th,
@@ -544,7 +552,6 @@
                 text-overflow: ellipsis;
                 white-space: nowrap;
             }
-            /* 根据数据源不同，国家/省份列位置不同：默认第3列是国家/省份，也做限制 */
             #comp-table th:nth-child(3),
             #comp-table td:nth-child(3) {
                 max-width: 60px;
@@ -553,7 +560,23 @@
                 white-space: nowrap;
             }
 
-            /* 省市纪录表格：项目名较长，但不需要特别限制，保持可读性 */
+            /* 首页标语手机端不换行 */
+            .home-slogan {
+                font-size: 1.8rem;
+                white-space: nowrap;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .home-slogan {
+                font-size: 1.4rem;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .home-slogan {
+                font-size: 1.2rem;
+            }
         }
     </style>
 </head>
@@ -808,9 +831,7 @@
     // ========== 首页 ==========
     function renderHome() {
         return `
-            <div style="text-align: center; margin: 50px 0;">
-                <h3 style="font-size: 2.5rem; color: #4a6ee0;">探索未来，未来已来。</h3>
-            </div>
+            <div class="home-slogan">探索未来，未来已来。</div>
             <div class="announcement">
                 <h3><i class="fab fa-tencent-weibo"></i> 公告</h3>
                 <div id="announcement-content">
