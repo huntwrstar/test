@@ -602,7 +602,7 @@
         active: { project: '333', type: 'single', scope: 'country:China', gender: 'all', continent: '', country: 'China' },
         region: { 
             project: '333', type: 'single', period: 'historical', 
-            province: '北京', city: '全部城市', gender: 'all',
+            province: '北京', city: '全省', gender: 'all',
             allProvinces: [],
             provinceCities: {}
         },
@@ -613,14 +613,14 @@
             selectedEvents: ['333'],
             gender: 'all',
             province: '',
-            city: '全部城市',
+            city: '全省',
             type: 'single',
             rankedData: [],
             currentPage: 1
         },
         record: {
             province: '北京',
-            city: '全部城市',
+            city: '全省',
             gender: 'all',
             allProvinces: [],
             provinceCities: {},
@@ -1107,13 +1107,13 @@
         } else {
             citySelect.disabled = false;
             const cities = state.region.provinceCities[province] || [];
-            let options = '<option value="全部城市">全部城市</option>';
+            let options = '<option value="全省">全省</option>';
             cities.forEach(c => {
                 options += `<option value="${c}">${c}</option>`;
             });
             citySelect.innerHTML = options;
-            citySelect.value = '全部城市';
-            state.region.city = '全部城市';
+            citySelect.value = '全省';
+            state.region.city = '全省';
         }
     }
 
@@ -1124,7 +1124,7 @@
         document.getElementById('region-current-project').textContent = getProjectName(project);
         document.getElementById('region-current-type').textContent = type === 'single' ? '单次' : '平均';
         document.getElementById('region-current-period').textContent = 
-            period === 'historical' ? '历史最好' : (period === 'season' ? '赛季' : '现役');
+            period === 'historical' ? '历史' : (period === 'season' ? '赛季' : '现役');
 
         const thead = document.querySelector('#region-table thead');
         if (thead) {
