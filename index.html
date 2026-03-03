@@ -617,8 +617,8 @@
         tooltipTimer: null
     };
 
-    // 直辖市和特别行政区列表（城市下拉禁用）
-    const MUNICIPALITIES = ['北京', '上海', '重庆', '天津', '台湾', '香港', '澳门'];
+    // 直辖市和特别行政区列表（城市下拉禁用）—— 已添加“神手谷”
+    const MUNICIPALITIES = ['北京', '上海', '重庆', '天津', '台湾', '香港', '澳门', '神手谷'];
 
     // 项目列表
     const PROJECT_LIST = [
@@ -688,8 +688,13 @@
         return formatResultForSort(timeStr);
     }
 
+    // 修改：最少步纯数字直接返回，不再转换
     function formatResult(resultStr) {
         if (!resultStr || resultStr === 'DNF' || resultStr === '暂无') return '暂无';
+        // 如果是纯数字（最少步）直接返回原值
+        if (/^\d+$/.test(String(resultStr).trim())) {
+            return resultStr;
+        }
         if (typeof resultStr === 'string' && (resultStr.includes(':') || resultStr.includes('.')) && !/^\d+$/.test(resultStr)) {
             return resultStr;
         }
@@ -703,6 +708,26 @@
         } else {
             return seconds;
         }
+    }
+
+    // 提取中文名：如果姓名包含括号，返回括号内的内容，否则返回原名
+    function extractChineseName(name) {
+        if (name && name.includes('(') && name.includes(')')) {
+            const match = name.match(/\(([^)]+)\)/);
+            if (match) return match[1].trim();
+        }
+        return name;
+    }
+
+    // 根据选手信息获取显示用姓名（中国选手优先显示中文名）
+    function getDisplayName(item) {
+        const name = item.name || '';
+        // 判断是否为中国选手：有country且为China，或者有province（省市数据中无country但都是中国选手）
+        const isChinese = (item.country === 'China') || (item.province);
+        if (isChinese) {
+            return extractChineseName(name);
+        }
+        return name;
     }
 
     function recomputeRanks(data) {
@@ -1564,7 +1589,9 @@
         const source = state.comprehensive.source;
         let html = '';
         data.forEach(item => {
-            let row = `<tr><td class="rank-cell">${item.displayRank}</td><td>${item.name}</td>`;
+            // 使用 getDisplayName 处理姓名
+            const displayName = getDisplayName(item);
+            let row = `<tr><td class="rank-cell">${item.displayRank}</td><td>${displayName}</td>`;
             if (source === 'province') {
                 row += `<td>${item.province || ''}</td><td>${item.city || ''}</td>`;
             } else {
@@ -1813,20 +1840,23 @@
                 html += `<tr><td colspan="5" class="empty-cell">暂无纪录</td></tr>`;
             } else {
                 if (singleRec) {
+                    // 使用 extractChineseName 处理姓名（所有纪录都是中国选手）
+                    const displayName = extractChineseName(singleRec.name);
                     html += `<tr>
                         <td></td>
                         <td>${formatResult(singleRec.result)}</td>
                         <td></td>
-                        <td>${singleRec.name}</td>
+                        <td>${displayName}</td>
                         <td>${singleRec.competition || ''}</td>
                     </tr>`;
                 }
                 if (avgRec) {
+                    const displayName = extractChineseName(avgRec.name);
                     html += `<tr>
                         <td></td>
                         <td></td>
                         <td>${formatResult(avgRec.result)}</td>
-                        <td>${avgRec.name}</td>
+                        <td>${displayName}</td>
                         <td>${avgRec.competition || ''}</td>
                     </tr>`;
                 }
@@ -2057,9 +2087,10 @@
         if (!tbody) return;
         if (regionMode) {
             tbody.innerHTML = data.map(item => {
+                const displayName = getDisplayName(item);
                 return `<tr>
                     <td class="rank-cell">${item.displayRank || item.rank}</td>
-                    <td>${item.name}</td>
+                    <td>${displayName}</td>
                     <td>${item.province || ''}</td>
                     <td>${item.city || ''}</td>
                     <td>${formatResult(item.result)}</td>
@@ -2068,16 +2099,18 @@
                 </tr>`;
             }).join('');
         } else {
-            tbody.innerHTML = data.map(item => `
+            tbody.innerHTML = data.map(item => {
+                const displayName = getDisplayName(item);
+                return `
                 <tr>
                     <td class="rank-cell">${item.displayRank || item.rank}</td>
-                    <td>${item.name}</td>
+                    <td>${displayName}</td>
                     <td>${item.country}</td>
                     <td>${formatResult(item.result)}</td>
                     <td>${item.competition || ''}</td>
                     <td>${item.wcaid}</td>
                 </tr>
-            `).join('');
+            `}).join('');
         }
     }
 
