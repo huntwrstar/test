@@ -7,7 +7,7 @@
     <link rel="icon" href="logo.png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* ========== 全局重置 ========== */
+
         * {
             margin: 0;
             padding: 0;
@@ -95,7 +95,7 @@
             .mobile-menu-icon { display: block; }
             .mobile-nav.show { display: flex; }
         }
-/* 手机端：logo 区域不换行、自动适配字体 */
+
 @media (max-width: 640px) {
     .header {
         padding: 12px 20px;
@@ -175,7 +175,7 @@
             font-size: 0.85rem;
             z-index: 10;
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-            animation: fadeOut 6s forwards;
+            animation: fadeOut 8s forwards;
         }
         @keyframes fadeOut {
             0% { opacity: 1; }
@@ -242,7 +242,7 @@
             width: calc(25% - 16px);
             min-width: 100px;
         }
-        /* 项目标签样式 - 电脑端每行8个 */
+
         .project-tag-group {
             display: flex;
             flex-wrap: wrap;
@@ -274,7 +274,7 @@
             border-color: #4a6ee0;
             color: white;
         }
-        /* 手机端适配：每行3个 */
+ 
         @media (max-width: 768px) {
             .project-tag {
                 width: calc(33.33% - 6px);
@@ -439,7 +439,7 @@
         .footer a { color: #4a6ee0; text-decoration: none; }
         .hidden { display: none !important; }
 
-        /* 加载动画样式 - 增强版 */
+
         .loading-cell {
             text-align: center;
             padding: 40px 0;
@@ -468,7 +468,7 @@
             80%, 100% { content: '...'; }
         }
 
-        /* 综合排名专用加载指示器 */
+
         .loading-indicator {
             text-align: center;
             padding: 30px;
@@ -483,7 +483,7 @@
             margin-right: 10px;
         }
 
-        /* 省市纪录专用表格样式 */
+
         .region-cell {
             background-color: #f0f7ff !important;
             font-weight: bold;
@@ -506,20 +506,20 @@
             text-align: left;
         }
 
-        /* ========== 手机端表格优化 ========== */
+
         @media (max-width: 640px) {
             .table-container th,
             .table-container td {
                 padding: 8px 6px;
                 font-size: 0.8rem;
-                /* 确保单元格内容不换行，通过水平滚动查看完整内容 */
+  
                 white-space: nowrap;
                 max-width: none;
                 overflow: visible;
                 text-overflow: clip;
             }
 
-            /* 移除所有特定列的宽度限制和换行设置，保持全局 nowrap */
+
             #season-table th,
             #season-table td,
             #active-table th,
@@ -534,27 +534,74 @@
                 text-overflow: clip !important;
             }
 
-            /* 省市纪录表格：项目名较长，但也不需要换行，保持单行 */
+
             #record-table th,
             #record-table td {
                 white-space: nowrap;
             }
         }
 
-        /* ----- 新增：手机端首页标题在逗号后换行 ----- */
+
+
+        .home-title {
+            font-size: 2.5rem;
+            color: #4a6ee0;
+        }
         @media (max-width: 640px) {
-            .home-title span {
-                display: block;
+            .home-title {
+                font-size: 1.8rem;
             }
         }
+        @media (max-width: 480px) {
+            .home-title {
+                font-size: 1.5rem;
+            }
+        }
+        @media (max-width: 360px) {
+            .home-title {
+                font-size: 1.2rem;
+            }
+        }
+
+.announcement-list {
+    margin: 20px 0;
+}
+
+
+.announcement-card {
+    background-color: #ffffff;
+    border: 1px solid #b8daff;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 4px rgba(0,64,128,0.1);
+}
+
+.announcement-card:last-child {
+    margin-bottom: 0;
+}
+
+
+.announcement-header {
+    color: #004085;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+.announcement-header i {
+    margin-right: 8px;
+}
     </style>
+<script>
+  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
 <div class="wrapper">
     <header class="header">
         <div class="logo-area">
             <h1>XCUBING · 魔方排名网</h1>
-            <span>探索未来，未来已来</span>
         </div>
     </header>
 
@@ -574,12 +621,12 @@
     <div class="content" id="app"></div>
 
     <footer class="footer">
-        <div>Copyright © XCUBING.CN · 成绩数据源自WCA</div>
+        <div>Copyright © 2026 XCUBING.CN</div>
     </footer>
 </div>
 
 <script>
-    // ========== 全局状态 ==========
+
     const state = {
         currentPage: 'home',
         meta: null,
@@ -617,10 +664,9 @@
         tooltipTimer: null
     };
 
-    // 直辖市和特别行政区列表（城市下拉禁用）—— 已添加“神手谷”
     const MUNICIPALITIES = ['北京', '上海', '重庆', '天津', '台湾', '香港', '澳门', '神手谷'];
 
-    // 项目列表
+ 
     const PROJECT_LIST = [
         {code:'333', name:'三阶'},{code:'222', name:'二阶'},{code:'444', name:'四阶'},{code:'555', name:'五阶'},
         {code:'666', name:'六阶'},{code:'777', name:'七阶'},{code:'333bf', name:'三盲'},{code:'333fm', name:'最少步'},
@@ -629,7 +675,6 @@
         {code:'333mbf', name:'多盲'}
     ];
 
-    // ========== 工具函数 ==========
     async function fetchJSON(url) {
         console.log(`开始加载: ${url}`);
         const res = await fetch(url);
@@ -656,7 +701,6 @@
         return data;
     }
 
-    // 显示加载动画（增强版带旋转图标）
     function showPageLoading(page) {
         const tbody = document.getElementById(`${page}-tbody`);
         if (!tbody) return;
@@ -688,10 +732,24 @@
         return formatResultForSort(timeStr);
     }
 
-    // 修改：最少步纯数字直接返回，不再转换
+
+    function parseMBF(resultStr) {
+        if (!resultStr || resultStr === 'DNF' || resultStr === '暂无') return null;
+        const match = String(resultStr).match(/^(\d+)\/(\d+)\s+(\d+):(\d+(?:\.\d+)?)$/);
+        if (!match) return null;
+        const success = parseInt(match[1], 10);
+        const attempts = parseInt(match[2], 10);
+        const minutes = parseInt(match[3], 10);
+        const seconds = parseFloat(match[4]);
+        const timeSeconds = minutes * 60 + seconds;
+        const fail = attempts - success;
+        return { success, attempts, fail, timeSeconds };
+    }
+
     function formatResult(resultStr) {
         if (!resultStr || resultStr === 'DNF' || resultStr === '暂无') return '暂无';
-        // 如果是纯数字（最少步）直接返回原值
+
+        if (typeof resultStr === 'string' && resultStr.includes('/') && resultStr.includes(':')) return resultStr;
         if (/^\d+$/.test(String(resultStr).trim())) {
             return resultStr;
         }
@@ -710,13 +768,11 @@
         }
     }
 
-    // 提取中文名：如果姓名包含括号且括号内包含中文，返回括号内的内容，否则返回原名
     function extractChineseName(name) {
         if (name && name.includes('(') && name.includes(')')) {
             const match = name.match(/\(([^)]+)\)/);
             if (match) {
                 const inside = match[1].trim();
-                // 检测括号内是否包含中文字符
                 if (/[\u4e00-\u9fa5]/.test(inside)) {
                     return inside;
                 }
@@ -725,10 +781,8 @@
         return name;
     }
 
-    // 根据选手信息获取显示用姓名（中国选手优先显示中文名，但仅当括号内是中文）
     function getDisplayName(item) {
         const name = item.name || '';
-        // 判断是否为中国选手：有country且为China，或者有province（省市数据中无country但都是中国选手）
         const isChinese = (item.country === 'China') || (item.province);
         if (isChinese) {
             return extractChineseName(name);
@@ -736,27 +790,67 @@
         return name;
     }
 
-    function recomputeRanks(data) {
+
+    function recomputeRanks(data, project) {
         data = data.filter(item => item && item.result !== undefined);
-        console.log(`recomputeRanks: 过滤后数据 ${data.length} 条`);
-        data.sort((a,b) => parseTime(a.result) - parseTime(b.result));
-        let rank = 1, lastResult = null, sameCount = 0;
-        return data.map((item, idx) => {
-            const res = item.result;
-            if (idx === 0) {
-                lastResult = res;
-                return { ...item, rank: rank };
+        
+        if (project === '333mbf') {
+
+            data.sort((a, b) => {
+                const aParsed = parseMBF(a.result);
+                const bParsed = parseMBF(b.result);
+                const aValid = aParsed !== null;
+                const bValid = bParsed !== null;
+                if (!aValid && !bValid) return 0;
+                if (!aValid) return 1;      
+                if (!bValid) return -1;
+                const aScore = aParsed.success - aParsed.fail;
+                const bScore = bParsed.success - bParsed.fail;
+                if (aScore !== bScore) return bScore - aScore;   
+                if (aParsed.timeSeconds !== bParsed.timeSeconds) return aParsed.timeSeconds - bParsed.timeSeconds;
+                return aParsed.fail - bParsed.fail;
+            });
+        } else {
+            data.sort((a, b) => parseTime(a.result) - parseTime(b.result));
+        }
+
+        let rank = 1;
+        let sameCount = 0;
+        for (let i = 0; i < data.length; i++) {
+            const item = data[i];
+            if (i === 0) {
+                item.rank = rank;
+                continue;
             }
-            if (res === lastResult) {
+            let isSame = false;
+            if (project === '333mbf') {
+                const prevParsed = parseMBF(data[i-1].result);
+                const currParsed = parseMBF(item.result);
+                if (prevParsed && currParsed) {
+                    const prevScore = prevParsed.success - prevParsed.fail;
+                    const currScore = currParsed.success - currParsed.fail;
+                    isSame = (prevScore === currScore) &&
+                             (prevParsed.timeSeconds === currParsed.timeSeconds) &&
+                             (prevParsed.fail === currParsed.fail);
+                } else if (!prevParsed && !currParsed) {
+                    isSame = true;   
+                } else {
+                    isSame = false;
+                }
+            } else {
+                isSame = (item.result === data[i-1].result);
+            }
+
+            if (isSame) {
                 sameCount++;
-                return { ...item, rank: rank };
+                item.rank = rank;
             } else {
                 rank += 1 + sameCount;
                 sameCount = 0;
-                lastResult = res;
-                return { ...item, rank: rank };
+                item.rank = rank;
             }
-        });
+        }
+        return data;
     }
 
     function paginate(data, page, pageSize = 100) {
@@ -764,7 +858,6 @@
         return data.slice(start, start + pageSize);
     }
 
-    // 改进的分页渲染函数，支持动态更新当前页
     function renderPagination(containerId, totalPages, currentPage, callback) {
         const container = document.getElementById(containerId);
         if (!container) return;
@@ -809,7 +902,6 @@
         });
     }
 
-    // ========== 路由 ==========
     async function loadPage(page) {
         console.log(`切换到页面: ${page}`);
         state.currentPage = page;
@@ -828,29 +920,34 @@
         }
     }
 
-    // ========== 首页 ==========
-    function renderHome() {
-        return `
-            <div style="text-align: center; margin: 50px 0;">
-                <!-- 修改：将标题拆分为两个 span，并添加类名 home-title，用于手机端换行 -->
-                <h3 style="font-size: 2.5rem; color: #4a6ee0;" class="home-title"><span>探索未来，</span><span>未来已来。</span></h3>
+function renderHome() {
+    return `
+        <div style="text-align: center; margin: 50px 0;">
+            <h3 class="home-title"><span>探索未来，</span><span>未来已来。</span></h3>
+        </div>
+        <div class="announcement-list">
+            <div class="announcement">
+                <h3>关于省市信息</h3>
+                <div class="announcement-card">
+                    <p>2018年5月粗饼网取消选手所在城市显示，由于现在已无法从粗饼网获取选手城市，故而此后的选手在本站被作者归入了不存在的神手谷。</p>
+                    <p>目前使用的选手省市信息源自魔友赵吉波在取消前爬取的数据，非常感谢前辈留下的数据。</p>
+                </div>
             </div>
             <div class="announcement">
-                <h3><i class="fab fa-tencent-weibo"></i> 公告</h3>
-                <div id="announcement-content">
-                    <p>网站上线试运行中… 欢迎反馈建议。</p>
-                    <p>排名数据更新至 2026-02-28。</p>
+                <h3>网站上线</h3>
+                <div class="announcement-card">
+                    <p>XCUBING网站正式上线运行，网站目前提供WCA赛事的赛季、现役、省市、综合排名及省市纪录功能，对具体页面的功能若有疑问可点击问号图标，诚挚欢迎广大魔友积极体验并对网站在页面显示、功能使用等方面存在的问题和不足提出宝贵意见和建议。如您在访问网站过程中发现任何错误、故障，请及时通过以下方式反馈：</p>
+                    <p>作者邮箱：xcubing@qq.com。</p>
                 </div>
-
             </div>
+        </div>
         `;
     }
 
-    // ========== 赛季排名 ==========
     function renderSeason() {
         return `
             <div class="page-heading">
-                <h2>赛季排名 <span class="tooltip-icon" id="season-tooltip" data-tooltip="本页面为赛季排名，以一年为一个赛季将参赛选手在当个赛季的最佳成绩进行排名；所有的排名成绩源自WCA赛事的官方排名。">?</span></h2>
+                <h2>赛季排名 <span class="tooltip-icon" id="season-tooltip" data-tooltip="本页面为赛季排名，以一年为一个赛季（如2026年即为2026赛季），将参赛选手在这个赛季的最佳成绩进行排名，反应选手在当前赛季的最高竞技水平，所有的排名成绩源自WCA赛事的官方排名。">?</span></h2>
             </div>
             <div class="filter-section">
                 <div class="filter-item">
@@ -904,7 +1001,7 @@
             console.log(`赛季数据性别筛选后: ${data.length}`);
             data = applyScopeFilter(data, continent, country);
             console.log(`赛季数据范围筛选后: ${data.length}`);
-            renderTable('season', data);
+            renderTable('season', data, project);
         } catch (e) {
             console.error(e);
             const tbody = document.getElementById('season-tbody');
@@ -912,11 +1009,10 @@
         }
     }
 
-    // ========== 现役排名 ==========
     function renderActive() {
         return `
             <div class="page-heading">
-                <h2>现役排名 <span class="tooltip-icon" id="active-tooltip" data-tooltip="本页面为现役排名，以三年为期，将参赛选手在此期间的最佳成绩进行排名，超过三年无参赛记录的选手将不被列入排名；所有的排名成绩源自WCA赛事的官方排名。">?</span></h2>
+                <h2>现役排名 <span class="tooltip-icon" id="active-tooltip" data-tooltip="本页面为现役排名，以三年为期，将参赛选手在此期间的最佳成绩进行排名，反应选手在最近三年的最高竞技水平，超过三年无参赛记录的选手不被列入排名，所有的排名成绩源自WCA赛事的官方排名。">?</span></h2>
             </div>
             <div class="filter-section">
                 <div class="filter-item">
@@ -970,7 +1066,7 @@
             console.log(`现役数据性别筛选后: ${data.length}`);
             data = applyScopeFilter(data, continent, country);
             console.log(`现役数据范围筛选后: ${data.length}`);
-            renderTable('active', data);
+            renderTable('active', data, project);
         } catch (e) {
             console.error(e);
             const tbody = document.getElementById('active-tbody');
@@ -978,11 +1074,10 @@
         }
     }
 
-    // ========== 省市排名 ==========
     function renderRegion() {
         return `
             <div class="page-heading">
-                <h2>省市排名 <span class="tooltip-icon" id="region-tooltip" data-tooltip="本页面为省市排名，可以查看中国选手在其归属地的排名，2018年5月下旬前没有在粗饼网选择归属地的选手将自动加入作者虚构的秘境——神手谷；所有的排名成绩源自WCA赛事的官方排名。">?</span></h2>
+                <h2>省市排名 <span class="tooltip-icon" id="region-tooltip" data-tooltip="本页面为省市排名，可以查看中国选手在其归属地的排名，2018年5月前没有在粗饼网选择归属地的选手将自动加入作者虚构的秘境——神手谷，所有的排名成绩源自WCA赛事的官方排名。">?</span></h2>
             </div>
             <div class="filter-section">
                 <div class="filter-item">
@@ -1123,7 +1218,6 @@
         } else {
             citySelect.disabled = false;
             const cities = state.region.provinceCities[province] || [];
-            // 修改：将“全部城市”改为“全省”
             let options = '<option value="全部城市">全省</option>';
             cities.forEach(c => {
                 options += `<option value="${c}">${c}</option>`;
@@ -1170,7 +1264,7 @@
                 data = data.filter(d => d.city === city);
                 console.log(`省市数据城市筛选后 (${city}): ${data.length}`);
             }
-            renderTable('region', data);
+            renderTable('region', data, project);
         } catch (e) {
             console.error(e);
             const tbody = document.getElementById('region-tbody');
@@ -1178,14 +1272,13 @@
         }
     }
 
-    // ========== 综合排名 ==========
     function renderComprehensive() {
         return `
             <div class="page-heading">
-                <h2>综合排名 <span class="tooltip-icon" id="comp-tooltip" data-tooltip="本页面为综合排名，可计算选手在多个项目的排名总和进行排名。">?</span></h2>
+                <h2>综合排名 <span class="tooltip-icon" id="comp-tooltip" data-tooltip="本页面为综合排名，可计算选手在多个项目的排名总和并进行排名。">?</span></h2>
             </div>
             <div style="margin-bottom: 15px;">
-                <label style="font-size: 0.85rem; font-weight: 600; text-transform: uppercase; color: #6c757d; margin-bottom: 5px; display: block;">项目（点击选择）</label>
+                <label style="font-size: 0.85rem; font-weight: 600; text-transform: uppercase; color: #6c757d; margin-bottom: 5px; display: block;">项目(点击选择)</label>
                 <div class="project-tag-group" id="comp-project-tags"></div>
             </div>
             <div class="filter-section" id="comp-filters">
@@ -1242,7 +1335,6 @@
         `;
     }
 
-    // 渲染项目标签
     function renderProjectTags() {
         const container = document.getElementById('comp-project-tags');
         if (!container) return;
@@ -1377,7 +1469,6 @@
             const data = await fetchJSON(`data/region/historical/single/333.json`);
             const cities = [...new Set(data.filter(d => d.province === province).map(d => d.city).filter(c => c))].sort();
             citySelect.disabled = false;
-            // 修改：将“全部城市”改为“全省”
             citySelect.innerHTML = '<option value="全部城市">全省</option>' + 
                 cities.map(c => `<option value="${c}">${c}</option>`).join('');
             citySelect.value = '全部城市';
@@ -1471,7 +1562,7 @@
                     }
                 });
 
-                const ranked = recomputeRanks(data);
+                const ranked = recomputeRanks(data, proj);
                 const rankMap = {};
                 ranked.forEach(item => {
                     rankMap[item.wcaid] = item.rank;
@@ -1595,7 +1686,6 @@
         const source = state.comprehensive.source;
         let html = '';
         data.forEach(item => {
-            // 使用 getDisplayName 处理姓名
             const displayName = getDisplayName(item);
             let row = `<tr><td class="rank-cell">${item.displayRank}</td><td>${displayName}</td>`;
             if (source === 'province') {
@@ -1609,11 +1699,10 @@
         tbody.innerHTML = html || `<tr><td colspan="${source === 'province' ? 6 : 5}">暂无数据</td></tr>`;
     }
 
-    // ========== 省市纪录页面 ==========
     function renderRecord() {
         return `
             <div class="page-heading">
-                <h2>省市纪录 <span class="tooltip-icon" id="record-tooltip" data-tooltip="本页面为省市纪录页，可以查看所有WCA项目的各省份及城市纪录，所有的成绩纪录源自WCA官方排名。">?</span></h2>
+                <h2>省市纪录 <span class="tooltip-icon" id="record-tooltip" data-tooltip="本页面为省市纪录，可以查看中国有参赛选手的省份及城市在WCA所有项目的纪录，所有的成绩源自WCA官方排名。">?</span></h2>
             </div>
             <div class="filter-section">
                 <div class="filter-item">
@@ -1659,7 +1748,6 @@
         `;
     }
 
-    // 工具函数：从原始数据中获取城市列表
     function extractCitiesFromRawData(province) {
         if (!state.record.dataLoaded) return [];
         const citiesSet = new Set();
@@ -1676,7 +1764,6 @@
         return Array.from(citiesSet).sort((a,b) => a.localeCompare(b, 'zh'));
     }
 
-    // 更新城市下拉框
     function updateRecordCitySelect(province) {
         const citySelect = document.getElementById('record-city');
         if (!citySelect) return;
@@ -1688,7 +1775,6 @@
         } else {
             citySelect.disabled = false;
             const cities = extractCitiesFromRawData(province);
-            // 修改：将“全部城市”改为“全省”
             let options = '<option value="全部城市">全省</option>';
             cities.forEach(c => options += `<option value="${c}">${c}</option>`);
             citySelect.innerHTML = options;
@@ -1699,7 +1785,6 @@
         }
     }
 
-    // 加载所有原始数据（单次/平均）
     async function loadAllRecordsData() {
         if (state.record.dataLoaded) return;
         state.record.loading = true;
@@ -1745,60 +1830,95 @@
         }
     }
 
-    // 根据当前筛选条件计算每个项目的最佳成绩
     function computeBestForFilters(province, city, gender) {
         const result = {};
         for (let proj of PROJECT_LIST) {
             const singleBest = { value: Infinity, record: null };
             const avgBest = { value: Infinity, record: null };
+            const projCode = proj.code;
 
-            const singleList = state.record.rawDataByProject[proj.code]?.single || [];
-            singleList.forEach(item => {
-                if (item.province !== province) return;
-                if (city !== '全部城市' && item.city !== city) return;
-                if (gender !== 'all' && item.gender !== gender) return;
+            const singleList = state.record.rawDataByProject[projCode]?.single || [];
+            const avgList = state.record.rawDataByProject[projCode]?.average || [];
 
-                const val = parseTime(item.result);
-                if (val < singleBest.value) {
-                    singleBest.value = val;
-                    singleBest.record = {
-                        result: item.result,
-                        name: item.name,
-                        competition: item.competition,
-                        date: item.date,
-                        wcaid: item.wcaid
-                    };
-                } else if (val === singleBest.value && singleBest.record) {
-                    if (item.date && singleBest.record.date && item.date < singleBest.record.date) {
+            if (projCode === '333mbf') {
+                let bestScore = -Infinity, bestTime = Infinity, bestFail = Infinity;
+                singleList.forEach(item => {
+                    if (item.province !== province) return;
+                    if (city !== '全部城市' && item.city !== city) return;
+                    if (gender !== 'all' && item.gender !== gender) return;
+                    const parsed = parseMBF(item.result);
+                    if (!parsed) return;
+                    const score = parsed.success - parsed.fail;
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestTime = parsed.timeSeconds;
+                        bestFail = parsed.fail;
                         singleBest.record = { ...item };
+                    } else if (score === bestScore) {
+                        if (parsed.timeSeconds < bestTime) {
+                            bestTime = parsed.timeSeconds;
+                            bestFail = parsed.fail;
+                            singleBest.record = { ...item };
+                        } else if (parsed.timeSeconds === bestTime) {
+                            if (parsed.fail < bestFail) {
+                                bestFail = parsed.fail;
+                                singleBest.record = { ...item };
+                            } else if (parsed.fail === bestFail) {
+                                if (item.date && singleBest.record?.date && item.date < singleBest.record.date) {
+                                    singleBest.record = { ...item };
+                                }
+                            }
+                        }
                     }
-                }
-            });
-
-            const avgList = state.record.rawDataByProject[proj.code]?.average || [];
-            avgList.forEach(item => {
-                if (item.province !== province) return;
-                if (city !== '全部城市' && item.city !== city) return;
-                if (gender !== 'all' && item.gender !== gender) return;
-
-                const val = parseTime(item.result);
-                if (val < avgBest.value) {
-                    avgBest.value = val;
-                    avgBest.record = {
-                        result: item.result,
-                        name: item.name,
-                        competition: item.competition,
-                        date: item.date,
-                        wcaid: item.wcaid
-                    };
-                } else if (val === avgBest.value && avgBest.record) {
-                    if (item.date && avgBest.record.date && item.date < avgBest.record.date) {
-                        avgBest.record = { ...item };
+                });
+            } else {
+                singleList.forEach(item => {
+                    if (item.province !== province) return;
+                    if (city !== '全部城市' && item.city !== city) return;
+                    if (gender !== 'all' && item.gender !== gender) return;
+                    const val = parseTime(item.result);
+                    if (val < singleBest.value) {
+                        singleBest.value = val;
+                        singleBest.record = {
+                            result: item.result,
+                            name: item.name,
+                            competition: item.competition,
+                            date: item.date,
+                            wcaid: item.wcaid
+                        };
+                    } else if (val === singleBest.value && singleBest.record) {
+                        if (item.date && singleBest.record.date && item.date < singleBest.record.date) {
+                            singleBest.record = { ...item };
+                        }
                     }
-                }
-            });
+                });
+            }
 
-            result[proj.code] = {
+            if (projCode === '333mbf') {
+            } else {
+                avgList.forEach(item => {
+                    if (item.province !== province) return;
+                    if (city !== '全部城市' && item.city !== city) return;
+                    if (gender !== 'all' && item.gender !== gender) return;
+                    const val = parseTime(item.result);
+                    if (val < avgBest.value) {
+                        avgBest.value = val;
+                        avgBest.record = {
+                            result: item.result,
+                            name: item.name,
+                            competition: item.competition,
+                            date: item.date,
+                            wcaid: item.wcaid
+                        };
+                    } else if (val === avgBest.value && avgBest.record) {
+                        if (item.date && avgBest.record.date && item.date < avgBest.record.date) {
+                            avgBest.record = { ...item };
+                        }
+                    }
+                });
+            }
+
+            result[projCode] = {
                 single: singleBest.record,
                 average: avgBest.record
             };
@@ -1806,7 +1926,6 @@
         return result;
     }
 
-    // 渲染表格（根据当前筛选）
     async function loadRecordData() {
         const tbody = document.getElementById('record-tbody');
         if (!tbody) return;
@@ -1820,7 +1939,6 @@
         const gender = state.record.gender;
 
         document.getElementById('record-current-province').textContent = province;
-        // 修改：如果 city === '全部城市'，显示“全省”，否则显示原城市名
         let displayCity = (city === '全部城市') ? '全省' : city;
         document.getElementById('record-current-city').textContent = displayCity;
         let genderText = '所有';
@@ -1846,7 +1964,6 @@
                 html += `<tr><td colspan="5" class="empty-cell">暂无纪录</td></tr>`;
             } else {
                 if (singleRec) {
-                    // 省市纪录均为中国选手，使用 extractChineseName 处理姓名（判断括号内中文）
                     const displayName = extractChineseName(singleRec.name);
                     html += `<tr>
                         <td></td>
@@ -1871,7 +1988,6 @@
         tbody.innerHTML = html || '<tr><td colspan="5">暂无数据</td></tr>';
     }
 
-    // 初始化省市纪录页
     async function initRecord() {
         document.getElementById('record-tooltip')?.addEventListener('click', showTooltip);
 
@@ -1919,7 +2035,6 @@
         await loadRecordData();
     }
 
-    // ========== 通用辅助函数 ==========
     function projectOptions() {
         return PROJECT_LIST.map(p => `<option value="${p.code}">${p.name}</option>`).join('');
     }
@@ -2062,14 +2177,14 @@
         return data;
     }
 
-    function renderTable(page, data) {
+    function renderTable(page, data, project) {
         const tbody = document.getElementById(`${page}-tbody`);
         if (!tbody) {
             console.warn(`表格体 ${page}-tbody 不存在，无法渲染`);
             return;
         }
 
-        const ranked = recomputeRanks(data);
+        const ranked = recomputeRanks(data, project);
         console.log(`渲染表格 ${page}, 排名后数据条数: ${ranked.length}`);
 
         state.pagination.data = ranked;
@@ -2127,10 +2242,9 @@
         if (state.tooltipTimer) clearTimeout(state.tooltipTimer);
         state.tooltipTimer = setTimeout(() => {
             icon.classList.remove('active');
-        }, 6000);
+        }, 8000);
     }
 
-    // ========== 启动 ==========
     window.addEventListener('load', async () => {
         const menuIcon = document.getElementById('mobile-menu-icon');
         const mobileNav = document.getElementById('mobile-nav');
